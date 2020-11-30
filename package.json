@@ -1,0 +1,45 @@
+{
+  "name": "fiid-ee",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "deploy": "nuxt build && gcloud app deploy app.yaml --project aid-world-builder --quiet",
+    "db": "docker run -p 127.0.0.1:3306:3306 --name aid-world-builder-mysql -e MYSQL_ROOT_PASSWORD=password -d mysql:8",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "jsfix": "eslint --fix ./api"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/storage": "^5.3.0",
+    "@nuxtjs/auth": "^4.9.1",
+    "@nuxtjs/axios": "^5.12.2",
+    "axios": "^0.20.0",
+    "body-parser": "^1.19.0",
+    "celebrate": "^13.0.3",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.8.1",
+    "express": "^4.17.1",
+    "file-type": "^15.0.1",
+    "lodash": "^4.17.20",
+    "marked": "^1.2.0",
+    "mysql": "^2.18.1",
+    "node-html-parser": "^1.2.21",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
+    "normalize-url": "^5.1.0",
+    "nuxt": "^2.14.4",
+    "nuxt-compress": "^3.0.0",
+    "rate-limiter-flexible": "^2.1.10",
+    "sass-loader": "^10.0.2",
+    "slugify": "^1.4.5",
+    "sql-template-strings": "^2.2.2"
+  }
+}
