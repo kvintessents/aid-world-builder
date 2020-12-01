@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Node from '~/components/EditWorld/Node';
+import Node from '~/components/EditWorld/Node/Node';
 
 export default {
     components: { Node },

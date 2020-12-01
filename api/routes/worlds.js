@@ -20,13 +20,17 @@ async function saveWorld({ id, version, document }) {
 }
 
 async function createWorld({ name, isPublic, userId }) {
-    const document = JSON.stringify({});
+    const document = {
+        id: null,
+        nodes: [],
+        lastId: 0,
+    };
 
     return await query(sql`
         INSERT INTO worlds
             (user_id, name, is_public, document, version, created_at)
         VALUES
-            (${userId}, ${name}, ${isPublic}, '{}', 0, ${new Date()})
+            (${userId}, ${name}, ${isPublic}, ${JSON.stringify(document)}, 0, ${new Date()})
     `);
 }
 

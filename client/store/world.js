@@ -1,10 +1,10 @@
+import Vue from 'vue';
+
 async function syncronizeState($axios, state) {
     const document = { ...state };
     delete document.syncingCalls;
 
     const body = { document: JSON.stringify(document), version: Date.now() };
-
-    console.log(body);
 
     return await $axios.post(`/world/${state.id}`, body);
 }
@@ -47,10 +47,17 @@ export const state = () => ({
 
 export const mutations = {
     setWorld(state, world) {
-        console.log('Setting world', world);
-        Object.assign(state, world);
+        const document = JSON.parse(world.document);
+        document.nodes = document.nodes.map(node => {
+            return {
+                size: null,
+                ...node,
+            }
+        });
+        Object.assign(state, document);
+        state.id = world.id;
     },
-    addNode(state, position) {
+    addNode(state, position, size) {
         state.lastId += 1;
 
         if (!position) {
@@ -59,10 +66,13 @@ export const mutations = {
 
         state.nodes.push({
             id: state.lastId,
+            randomId: `${Math.random()}`,
             position: position,
 
             name: 'Meadow Hughes',
             tags: 'meadow, hughes, your sister',
+            labels: [],
+            size: null,
             properties: [
                 { key: "gender", value: "female" },
                 { key: "hair color", value: "auburn" },
@@ -75,9 +85,39 @@ export const mutations = {
         state.nodes[index].position.x = position.x;
         state.nodes[index].position.y = position.y;
     },
+    setNodeSize(state, { node, size }) {
+        const index = state.nodes.indexOf(node);
+        state.nodes[index].size = Vue.observable({
+            width: Math.max(size.width, 200),
+            height: Math.max(size.height, 200),
+        });
+    },
+    removeNodeSize(state, node) {
+        const index = state.nodes.indexOf(node);
+        state.nodes[index].size = null;
+    },
     setAttributes(state, { node, attributes }) {
         const index = state.nodes.indexOf(node);
         Object.assign(state.nodes[index], attributes);
+    },
+    addLabel(state, { node, label }) {
+        const nodeIndex = state.nodes.indexOf(node);
+
+        if (state.nodes[nodeIndex].labels.includes(label)) {
+            return;
+        }
+
+        state.nodes[nodeIndex].labels.push(label);
+    },
+    removeLabel(state, { node, label }) {
+        const nodeIndex = state.nodes.indexOf(node);
+        const labelIndex = state.nodes[nodeIndex].labels.indexOf(label);
+
+        if (labelIndex === -1) {
+            return;
+        }
+
+        state.nodes[nodeIndex].labels.splice(labelIndex, 1);
     },
     startSync(state) {
         state.syncingCalls += 1;
@@ -88,13 +128,27 @@ export const mutations = {
     setProperty(state, { node, index, value, key }) {
         const nodeIndex = state.nodes.indexOf(node);
 
-        if (value) {
+        if (typeof value === 'string') {
             state.nodes[nodeIndex].properties[index].value = value;
         }
 
-        if (key) {
+        if (typeof key === 'string') {
             state.nodes[nodeIndex].properties[index].key = key;
         }
+    },
+    appendNewProperty(state, node) {
+        const index = state.nodes.indexOf(node);
+
+        state.nodes[index].properties.push({key: '', value: ''})
+    },
+    removeProperty(state, { node, propertyIndex }) {
+        if (propertyIndex === undefined) {
+            console.warn('Property Index undefined');
+            return;
+        }
+
+        const index = state.nodes.indexOf(node)
+        state.nodes[index].properties.splice(propertyIndex, 1);
     }
 };
 
@@ -104,7 +158,6 @@ export const actions = {
         dispatch('sync');
     },
     async setAttributes({ dispatch, commit }, { node, attributes }) {
-        console.log('asdasdasd')
         commit('setAttributes', { node, attributes });
         dispatch('sync');
     },
@@ -116,14 +169,26 @@ export const actions = {
     async fetchWorld({ commit, state }, id) {
         const result = await this.$axios.get(`worlds/${id}`);
         const world = result.data.data;
-        commit('setWorld', JSON.parse(world.document));
+        commit('setWorld', world);
     },
     async setNodePosition({ commit, dispatch }, args) {
         commit('setNodePosition', args);
         dispatch('sync');
     },
+    async setNodeSize({ commit, dispatch }, args) {
+        commit('setNodeSize', args);
+        dispatch('sync');
+    },
+    async removeNodeSize({ commit, dispatch }, args) {
+        commit('removeNodeSize', args);
+        dispatch('sync');
+    },
     async setProperty({ commit, dispatch }, args) {
         commit('setProperty', args);
         dispatch('sync');
+    },
+    async removeProperty({ commit, dispatch }, args) {
+        commit('removeProperty', args);
+        // dispatch('sync');
     },
 }

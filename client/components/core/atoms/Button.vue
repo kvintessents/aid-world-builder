@@ -35,4 +35,8 @@ export default {
     .button[disabled] {
         background-color: #ddd;
     }
+
+    .button[small] {
+        padding: 0.5em 1em;
+    }
 </style>
