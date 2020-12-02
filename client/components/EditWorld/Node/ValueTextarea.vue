@@ -5,7 +5,7 @@
         v-on="listeners"
         v-bind="$attrs"
         ref="textarea"
-        :rows="rows"
+        rows="1"
     ></textarea>
 </template>
 
@@ -27,10 +27,7 @@ export default {
         listeners() {
             const { input, ...listeners } = this.$listeners;
             return listeners;
-        },
-        rows() {
-            return 1;
-        },
+        }
     },
     mounted() {
         this.resize();
@@ -50,5 +47,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    
+    .textarea {
+        resize: none;
+        max-width: 100%;
+    }
 </style>

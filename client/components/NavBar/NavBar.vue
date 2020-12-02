@@ -2,8 +2,8 @@
     <nav class="header">
         <div class="logo-container">
             <nuxt-link to="/" class="logo-link">
-                <h1 v-if="isFrontpage" class="logo">Fiid</h1>
-                <div v-else class="logo">Fiid</div>
+                <h1 v-if="isFrontpage" class="logo">AID World Builder</h1>
+                <div v-else class="logo">AID World Builder</div>
             </nuxt-link>
         </div>
         

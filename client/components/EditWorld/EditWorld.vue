@@ -19,7 +19,6 @@ export default {
 </script>
 <style scoped lang="scss">
     .create-world-container {
-        position: relative;
         padding: 2em;
     }
 </style>

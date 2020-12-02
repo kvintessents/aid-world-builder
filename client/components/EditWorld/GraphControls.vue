@@ -14,7 +14,7 @@ function download(object) {
     document.body.innerHTML += `
         <a
             id="download"
-            download="PATTERN.json"
+            download="AID-WORLD.json"
             href="${URL.createObjectURL(new Blob([JSON.stringify(object, null, 2)]))}"
         >Click me</a>
     `;

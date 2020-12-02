@@ -51,6 +51,8 @@ export const mutations = {
         document.nodes = document.nodes.map(node => {
             return {
                 size: null,
+                minimized: false,
+                selected: false,
                 ...node,
             }
         });
@@ -68,16 +70,25 @@ export const mutations = {
             id: state.lastId,
             randomId: `${Math.random()}`,
             position: position,
+            zIndex: state.lastId,
 
             name: 'Meadow Hughes',
             tags: 'meadow, hughes, your sister',
             labels: [],
             size: null,
+            minimized: false,
+            selected: false,
             properties: [
                 { key: "gender", value: "female" },
                 { key: "hair color", value: "auburn" },
                 { key: "hair length", value: "long" },
             ]
+        });
+    },
+    deleteNode(state, nodeToDelete) {
+        state.nodes = state.nodes.filter(node => {
+            console.log(node !== nodeToDelete);
+            return node !== nodeToDelete
         });
     },
     setNodePosition(state, {node, position}) {
@@ -91,10 +102,6 @@ export const mutations = {
             width: Math.max(size.width, 200),
             height: Math.max(size.height, 200),
         });
-    },
-    removeNodeSize(state, node) {
-        const index = state.nodes.indexOf(node);
-        state.nodes[index].size = null;
     },
     setAttributes(state, { node, attributes }) {
         const index = state.nodes.indexOf(node);
@@ -149,12 +156,39 @@ export const mutations = {
 
         const index = state.nodes.indexOf(node)
         state.nodes[index].properties.splice(propertyIndex, 1);
-    }
+    },
+    sendToTop(state, node) {
+        const index = state.nodes.indexOf(node);
+
+        const highestValue = state.nodes.reduce((highest, node) => {
+            return Math.max(highest, node.zIndex || 0);
+        }, 0);
+
+        state.nodes[index].zIndex = highestValue + 1;
+    },
+    minimizeNode(state, node) {
+        const index = state.nodes.indexOf(node);
+
+        state.nodes[index].minimized = !state.nodes[index].minimized;
+    },
+    selectNodes(state, selectedNodes) {
+        for (const node of state.nodes) {
+            if (selectedNodes.includes(node)) {
+                node.selected = true;
+            } else {
+                node.selected = false;
+            }
+        }
+    },
 };
 
 export const actions = {
     async addNode({ commit, dispatch }, position) {
         commit('addNode', position);
+        dispatch('sync');
+    },
+    async deleteNode({ commit, dispatch }, arg) {
+        commit('deleteNode', arg);
         dispatch('sync');
     },
     async setAttributes({ dispatch, commit }, { node, attributes }) {
@@ -179,16 +213,20 @@ export const actions = {
         commit('setNodeSize', args);
         dispatch('sync');
     },
-    async removeNodeSize({ commit, dispatch }, args) {
-        commit('removeNodeSize', args);
-        dispatch('sync');
-    },
     async setProperty({ commit, dispatch }, args) {
         commit('setProperty', args);
         dispatch('sync');
     },
+    async sendToTop({ commit, dispatch }, args) {
+        commit('sendToTop', args);
+        dispatch('sync');
+    },
     async removeProperty({ commit, dispatch }, args) {
         commit('removeProperty', args);
-        // dispatch('sync');
+        dispatch('sync');
+    },
+    async minimizeNode({ commit, dispatch }, args) {
+        commit('minimizeNode', args);
+        dispatch('sync');
     },
 }

@@ -1,64 +1,28 @@
 <template>
     <div
         class="Node"
-        @mousedown="dragStart"
+        :class="{ selected: node.selected }"
         :style="style"
         ref="node"
+        @mousedown="dragStart"
     >
-        <header class="header">
-            <input class="input name" @input="handleNameChange" :value="node.name" @mousedown="stopPropagation" />
-        </header>
+        <NodeContents :node="node" />
 
-        <section class="body">
-            <div class="contents" @mousedown="stopPropagation">
-                <input class="input tags" @input="handleTagsChange" :value="node.tags">
-
-                <table class="attributes">
-                    <tbody>
-                        <tr
-                            v-for="(attribute, index) in node.properties"
-                            :key="`${id}#${index}`"
-                            class="attribute"
-                        >
-                            <td>
-                                <input
-                                    class="input key"
-                                    :property-index="index"
-                                    @input="handleKeyChange"
-                                    @keydown="onValueKeyDown"
-                                    :value="attribute.key" />
-                            </td>
-                            <td>
-                                <ValueTextarea
-                                    class="input value"
-                                    :property-index="index"
-                                    @input="handleValueChange"
-                                    @keydown="onKeyKeyDown"
-                                    :value="attribute.value"
-                                    :rows="1"
-                                    :sizeCacheBreaker="sizeCacheBreaker"
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <footer class="footer">
-            <NodeLabelControl :node="node" />
-        </footer>
-
-        <div class="resize" @mousedown="resizeStart" @dblclick="resizeReset">X</div>
+        <div @mousedown="stopPropagation" @click="stopPropagation">
+            <div class="resize" @mousedown="resizeStart"></div>
+            <div class="delete" @click="deleteNode">ⓧ</div>
+            <div class="minimize" @click="minimizeNode">⊝</div>
+        </div>
     </div>
 </template>
 
 <script>
+import NodeContents from '~/components/EditWorld/Node/NodeContents';
 import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
 import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
 
 export default {
-    components: { NodeLabelControl, ValueTextarea },
+    components: { NodeLabelControl, ValueTextarea, NodeContents },
     props: {
         node: {
             type: Object,
@@ -84,27 +48,20 @@ export default {
                 }) 
             }
 
-            return style;
-        },
-        sizeCacheBreaker() {
-            if (!this.node.size) {
-                return '';
-            }
+            Object.assign(style, {
+                zIndex: this.node.zIndex || 0,
+            });
 
-            return this.node.size.width;
+            return style;
         }
-    },
-    beforeMount() {
-        
-    },
-    beforeDestroy() {
-        
     },
     methods: {
         dragStart(event) {
             this.dragging = true;
             window.addEventListener('mousemove', this.reposition);
             window.addEventListener('mouseup', this.dragStop);
+            this.sendToTop();
+            event.stopPropagation();
         },
         dragStop(event) {
             this.dragging = false;
@@ -129,6 +86,7 @@ export default {
             this.resizing = true;
             window.addEventListener('mousemove', this.resize);
             window.addEventListener('mouseup', this.resizeStop);
+            this.sendToTop();
         },
         resizeStop(event) {
             event.stopPropagation();
@@ -142,8 +100,6 @@ export default {
             }
 
             let currentSize = this.node.size;
-
-            console.log(currentSize);
 
             if (!currentSize) {
                 const size = this.$refs.node.getBoundingClientRect();
@@ -161,70 +117,22 @@ export default {
                 }
             });
         },
-        resizeReset(event) {
-            this.$store.dispatch('world/removeNodeSize', this.node);
-        },
-        handleNameChange(event) {
-            this.$store.dispatch('world/setAttributes', {
-                node: this.node,
-                attributes: { name: event.target.value }
-            });
-        },
-        handleTagsChange(event) {
-            this.$store.dispatch('world/setAttributes', {
-                node: this.node,
-                attributes: { tags: event.target.value }
-            });
-        },
-        handleKeyChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: event.target.getAttribute('property-index'),
-                key: event.target.value
-            });
-        },
-        handleValueChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: event.target.getAttribute('property-index'),
-                value: event.target.value
-            });
-        },
-        onKeyKeyDown(event) {
-            if (event.key !== 'Tab') {
-                return true;
-            }
-
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
-            const lastIndex = this.node.properties.length - 1;
-
-            if (index === lastIndex) {
-                this.$store.commit('world/appendNewProperty', this.node);
-            }
-
-            return true;
-        },
-        onValueKeyDown(event) {
-            if (event.key !== 'Backspace') {
-                return true;
-            }
-
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
-
-            if (
-                this.node.properties[index].value.trim() === '' &&
-                this.node.properties[index].key.trim() === ''
-            ) {
-                this.$store.dispatch('world/removeProperty', {
-                    node: this.node,
-                    propertyIndex: index
-                });
-            }
-
-            return true;
+        sendToTop() {
+            this.$store.dispatch('world/sendToTop', this.node);
         },
         stopPropagation(event) {
             event.stopPropagation();
+        },
+        deleteNode(event) {
+            event.stopPropagation();
+
+            if (window.confirm('Are you sure you wish to delete the entry? This cannot be undone.')) {
+                this.$store.dispatch('world/deleteNode', this.node);
+            }
+        },
+        minimizeNode(event) {
+            event.stopPropagation();
+            this.$store.dispatch('world/minimizeNode', this.node);
         }
     },
 }
@@ -234,10 +142,16 @@ export default {
 
     .Node {
         background: #fff;
-        border: 1px solid #000;
+        border: 1px solid #ccc;
         position: absolute;
         cursor: grab;
         user-select: none;
+        box-shadow: 0 5px 10px #00000020;
+        border-radius: 0.4em;
+    }
+
+    .Node.selected {
+        border: 1px solid #000;
     }
 
     .input {
@@ -248,62 +162,34 @@ export default {
         font-family: inherit;
     }
 
-    .body {
-        padding: 0 1.5em 1.5em 1.5em;
-    }
-
-    .contents {
-        cursor: initial;
-    }
-
-    .header {
-        padding: 1em 1.5em;
-        text-align: center;
-        background: rgba(0, 0, 0, 0.05);
-    }
-
-    .name {
-        width: 100%;
-        text-align: center;
-    }
-
-    .tags {
-        text-align: center;
-        padding: 1em;
-    }
-
-    div[contenteditable], td[contenteditable] {
-        cursor: text;
-    }
-
-    .attributes {
-        padding: 0;
-        margin: 0;
-        border-spacing: 0;
-        width: 100%;
-    }
-
-    .attributes tr:nth-child(odd) {
-        background: rgba(0, 0, 0, 0.05);
-    }
-
-    .attribute td {
-        padding: 0.5em;
-    }
-
-    .key {
-        font-weight: 600;
-        width: 6em;
-    }
-
-    .value {
-        resize: none;
-    }
-
     .resize {
         position: absolute;
-        right: 0;
-        bottom: 0;
+        right: -2px;
+        top: 0;
         cursor: ew-resize;
+        height: 100%;
+        width: 5px;
+    }
+
+    .Node:hover .delete, .Node:hover .minimize {
+        display: block;
+        cursor: pointer;
+    }
+
+    .delete {
+        display: none;
+        position: absolute;
+        right: 0.3em;
+        top: 0.2em;
+        color:rgb(255, 0, 0);
+    }
+
+    .minimize {
+        display: none;
+        position: absolute;
+        left: 0.2em;
+        top: 0.0em;
+        font-size: 1.5em;
+        color: #cea902;
     }
 </style>
