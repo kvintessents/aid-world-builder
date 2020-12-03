@@ -5,9 +5,7 @@
         </header>
 
 
-        <section class="content-wrapper">
-            <nuxt />
-        </section>
+        <nuxt class="content-wrapper" />
     </div>
 </template>
 
@@ -20,17 +18,21 @@
     }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     .page-header {
         position: sticky;
         z-index: 100;
         top: 0;
+        height: 50px;
     }
 
-    .fake-sidecontent {
-        padding: 1em;
+    .page-container {
+        width: 100vw;
+        height: 100vh;
+    }
 
-        position: sticky;
-        top: 5.5rem;
+    .content-wrapper {
+        width: 100vw;
+        height: calc(100vh - 50px);
     }
 </style>

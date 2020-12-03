@@ -20,5 +20,10 @@ export default {
 <style scoped lang="scss">
     .create-world-container {
         padding: 2em;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        overflow: auto;
+        user-select: none;
     }
 </style>

@@ -91,16 +91,23 @@ export const mutations = {
             return node !== nodeToDelete
         });
     },
-    setNodePosition(state, {node, position}) {
+    moveNodeBy(state, {node, position}) {
         const index = state.nodes.indexOf(node);
-        state.nodes[index].position.x = position.x;
-        state.nodes[index].position.y = position.y;
+        state.nodes[index].position.x += position.x;
+        state.nodes[index].position.y += position.y;
+
+        for (const selectedNode of state.nodes) {
+            if (selectedNode.selected && selectedNode !== node) {
+                selectedNode.position.x += position.x;
+                selectedNode.position.y += position.y;
+            }
+        }
     },
     setNodeSize(state, { node, size }) {
         const index = state.nodes.indexOf(node);
         state.nodes[index].size = Vue.observable({
             width: Math.max(size.width, 200),
-            height: Math.max(size.height, 200),
+            height: size.height
         });
     },
     setAttributes(state, { node, attributes }) {
@@ -180,6 +187,11 @@ export const mutations = {
             }
         }
     },
+    clearSelection(state) {
+        for (const node of state.nodes) {
+            node.selected = false;
+        }
+    }
 };
 
 export const actions = {
@@ -205,8 +217,8 @@ export const actions = {
         const world = result.data.data;
         commit('setWorld', world);
     },
-    async setNodePosition({ commit, dispatch }, args) {
-        commit('setNodePosition', args);
+    async moveNodeBy({ commit, dispatch }, args) {
+        commit('moveNodeBy', args);
         dispatch('sync');
     },
     async setNodeSize({ commit, dispatch }, args) {

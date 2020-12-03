@@ -1,6 +1,6 @@
 <template>
     <div>
-        <header class="header">
+        <header class="header" :class="{ selected: node.selected }">
             <input class="input name" @input="handleNameChange" :value="node.name" @mousedown="stopPropagation" />
         </header>
 
@@ -151,6 +151,7 @@ export default {
         background: transparent;
         font-family: inherit;
         font-size: 1em;
+        color: inherit;
     }
 
     .body {
@@ -169,6 +170,12 @@ export default {
         padding: 1em 1.5em;
         text-align: center;
         background: rgba(0, 0, 0, 0.05);
+        border-radius: 0.4em 0.4em 0 0;
+    }
+
+    .header.selected {
+        background: #00a7e5;
+        color: #fff;
     }
 
     .name {

@@ -26,7 +26,7 @@ export default {
     },
     computed: {
         selectionStyle() {
-            const boundingBox = this.boundingBox;
+            const boundingBox = this.selectionBoundingBox;
 
             return {
                 left: `${boundingBox.x}px`,
@@ -35,7 +35,7 @@ export default {
                 height: `${boundingBox.height}px`,
             }
         },
-        boundingBox() {
+        selectionBoundingBox() {
             const {x, y, width, height} = this.selection;
 
             if (width >= 0 && height >= 0) {
@@ -69,17 +69,26 @@ export default {
             this.selection.height = 0;
             window.addEventListener('mouseup', this.endSelect);
             window.addEventListener('mousemove', this.select);
+            window.addEventListener('click', this.clearSelection);
         },
         endSelect() {
             this.selecting = false;
             window.removeEventListener('mousemove', this.select);
             window.removeEventListener('mouseup', this.endSelect);
+            window.removeEventListener('click', this.clearSelection);
+        },
+        clearSelection() {
+            this.$store.commit('world/clearSelection');
         },
         select(event) {
             this.selection.width += event.movementX;
             this.selection.height += event.movementY;
-            const boundingBox = this.boundingBox;
+            const boundingBox = this.selectionBoundingBox;
             const selected = this.nodes.filter(node => {
+                if (node.name === 'Sword of Fire') {
+                    console.log(node.size.height);
+                }
+
                 return this.overlaps({
                     x: node.position.x,
                     y: node.position.y,

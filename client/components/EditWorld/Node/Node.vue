@@ -73,12 +73,9 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('world/setNodePosition', {
+            this.$store.dispatch('world/moveNodeBy', {
                 node: this.node,
-                position: {
-                    x: this.node.position.x + event.movementX,
-                    y: this.node.position.y + event.movementY,
-                }
+                position: { x: event.movementX, y: event.movementY }
             });
         },
         resizeStart(event) {
@@ -93,6 +90,7 @@ export default {
             this.resizing = false;
             window.removeEventListener('mousemove', this.resize);
             window.removeEventListener('mouseup', this.resizeStop);
+            this.syncNodeHeight();
         },
         resize() {
             if (!this.resizing) {
@@ -117,6 +115,17 @@ export default {
                 }
             });
         },
+        syncNodeHeight() {
+            const size = this.$refs.node.getBoundingClientRect();
+
+            this.$store.dispatch('world/setNodeSize', {
+                node: this.node,
+                size: {
+                    width: size.width,
+                    height: size.height,
+                }
+            });
+        },
         sendToTop() {
             this.$store.dispatch('world/sendToTop', this.node);
         },
@@ -133,6 +142,10 @@ export default {
         minimizeNode(event) {
             event.stopPropagation();
             this.$store.dispatch('world/minimizeNode', this.node);
+            setTimeout(() => {
+                this.syncNodeHeight();
+            }, 100);
+            
         }
     },
 }
@@ -148,6 +161,7 @@ export default {
         user-select: none;
         box-shadow: 0 5px 10px #00000020;
         border-radius: 0.4em;
+        box-sizing: border-box;
     }
 
     .Node.selected {
