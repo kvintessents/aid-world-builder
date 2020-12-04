@@ -39,8 +39,13 @@ router.get('/worlds/', userAuth, celebrate({
         user_id: Joi.number().default(null),
     }),
 }), asyncRoute(async function (req, res) {
+    const userId = res.locals.user.id;
     const result = await query(sql`
-        SELECT id, name, is_public, user_id, version, created_at FROM worlds
+        SELECT
+            id, name, is_public, user_id, version, created_at
+        FROM worlds
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
     `);
 
     res.json({ success: true, data: result });

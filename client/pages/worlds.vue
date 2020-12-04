@@ -8,10 +8,15 @@
                 </FormRow>
             </form>
         </Paper>
-        <Paper padded-2 class="world-list">
-            <div v-for="world in worlds" :key="world.id">
-                <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
-            </div>
+        <Paper v-if="worlds.length" padded-2 class="world-list-paper" >
+            <ol class="world-list">
+                <li class="world-list-element" v-for="world in worlds" :key="world.id">
+                    <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
+                </li>
+            </ol>
+        </Paper>
+        <Paper v-else padded-2 class="no-worlds">
+            Your worlds will appear here.
         </Paper>
     </div>
 </template>
@@ -76,7 +81,21 @@
         margin: 0 auto;
     }
 
-    .world-list, .create-world {
+    .world-list-paper, .create-world, .no-worlds {
         margin-top: 2em;
+    }
+
+    .no-worlds {
+        text-align: center;
+    }
+
+    .world-list {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    .world-list-element {
+        margin-bottom: 0.5em;
     }
 </style>
