@@ -1,7 +1,5 @@
 <template>
     <div>
-        <PageError v-if="pageError" :pageError="pageError" />
-
         <Paper padded-2 class="website-description">
             <p style="color:red;">This website is in very very VERY alpha stages - I've worked on this project for less than a week! If you create a user and world, I cannot guarantee that they won't be deleted at some point, so see yourself as an alpha tester.</p>
             <h2>AID World Builder</h2>
@@ -29,70 +27,10 @@
 </template>
 <script>
     import Paper from '~/components/core/atoms/Paper';
-    import PageError from '~/components/PageError';
 
     export default {
         layout: 'default',
-        components: { PageError, Paper },
-        async fetch({ store, $axios }) {
-            try {
-                // const response = await $axios.get('/posts');
-                // store.commit('posts/set', response.data.data);
-            } catch (e) {
-                console.log(e);
-                this.pageError = e;
-            }
-        },
-        data() {
-            return {
-                pageError: null,
-                loadingNextPosts: false,
-            }
-        },
-        computed: {
-            posts() {
-                return this.$store.state.posts.list;
-            }
-        },
-        mounted() {
-            window.addEventListener("scroll", this.handleScroll);
-        },
-        destroyed() {
-            window.removeEventListener("scroll", this.handleScroll);
-        },
-        methods: {
-            handleScroll() {
-                if (this.loadingNextPosts) {
-                    return;
-                }
-
-                if (!this.isCloseToBottom()) {
-                    return;
-                }
-                
-                this.loadNext();
-            },
-            isCloseToBottom() {
-                const diff = document.body.clientHeight - (window.scrollY + window.innerHeight);
-
-                if (diff <= 200) {
-                    return true;
-                }
-
-                return false;
-            },
-            async loadNext() {
-                this.loadingNextPosts = true;
-                const response = await this.$axios.get('/posts', { params: { offset: this.posts.length }});
-                const posts = response.data.data;
-
-                if (posts.length) {
-                    this.$store.commit('posts/add', posts);
-                }
-
-                this.loadingNextPosts = false;
-            },
-        }
+        components: { Paper },
     }
 </script>
 <style lang="scss" scoped>
