@@ -6,23 +6,26 @@
         ref="node"
         @mousedown="dragStart"
     >
-        <NodeContents :node="node" />
+        <NodePreview v-if="previewing" :node="node" />
+        <NodeContents v-else :node="node" />
 
-        <div @mousedown="stopPropagation" @click="stopPropagation">
+        <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
             <div class="resize" @mousedown="resizeStart"></div>
             <div class="delete" @click="deleteNode">ⓧ</div>
             <div class="minimize" @click="minimizeNode">⊝</div>
+            <div class="preview" @click="togglePreview">P</div>
         </div>
     </div>
 </template>
 
 <script>
 import NodeContents from '~/components/EditWorld/Node/NodeContents';
+import NodePreview from '~/components/EditWorld/Node/NodePreview';
 import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
 import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
 
 export default {
-    components: { NodeLabelControl, ValueTextarea, NodeContents },
+    components: { NodeLabelControl, ValueTextarea, NodeContents, NodePreview },
     props: {
         node: {
             type: Object,
@@ -32,6 +35,7 @@ export default {
     data() {
         return {
             dragging: false,
+            previewing: false,
             id: `node-${Math.floor(Math.random() * 1000000)}`
         }
     },
@@ -92,8 +96,8 @@ export default {
             window.removeEventListener('mouseup', this.resizeStop);
             this.syncNodeHeight();
         },
-        resize() {
-            if (!this.resizing) {
+        resize(force = false) {
+            if (!force && !this.resizing) {
                 return;
             }
 
@@ -146,6 +150,9 @@ export default {
                 this.syncNodeHeight();
             }, 100);
             
+        },
+        togglePreview(event) {
+            this.previewing = !this.previewing;
         }
     },
 }
@@ -185,13 +192,16 @@ export default {
         width: 5px;
     }
 
-    .Node:hover .delete, .Node:hover .minimize {
+    .hover-controls {
+        display: none;
+    }
+
+    .Node:hover .hover-controls {
         display: block;
         cursor: pointer;
     }
 
     .delete {
-        display: none;
         position: absolute;
         right: 0.3em;
         top: 0.2em;
@@ -199,11 +209,17 @@ export default {
     }
 
     .minimize {
-        display: none;
         position: absolute;
         left: 0.2em;
         top: 0.0em;
         font-size: 1.5em;
         color: #cea902;
+    }
+
+    .preview {
+        left: 2em;
+        top: 0.35em;
+        position: absolute;
+        color: #888;
     }
 </style>

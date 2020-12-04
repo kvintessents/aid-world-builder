@@ -9,6 +9,7 @@
 
 <script>
 import Button from '~/components/core/atoms/Button';
+import jsonFormatter from '~/utils/formatters/jsonFormatter';
 
 function download(object) {
     document.body.innerHTML += `
@@ -26,17 +27,7 @@ export default {
     components: { Button },
     methods: {
         download() {
-            const contents = this.$store.state.world.nodes.map(node => ({
-                id: node.randomId,
-                keys: node.tags,
-                entry: JSON.stringify({
-                    [node.name]: node.properties.reduce((acc, property) => {
-                        acc[property.key] = property.value
-                        return acc;
-                    }, {})
-                }),
-                isNotHidden: true
-            }))
+            const contents = this.$store.state.world.nodes.map(jsonFormatter)
             download(contents);
         }
     }

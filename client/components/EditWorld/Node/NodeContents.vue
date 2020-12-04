@@ -57,6 +57,10 @@ export default {
             type: Object,
             required: true,
         },
+        previewing: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {

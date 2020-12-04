@@ -1,7 +1,7 @@
 <template>
-    <div class="create-world-container">
-        <GraphControls />
-        <Graph />
+    <div class="container">
+        <GraphControls class="container__controls" />
+        <Graph class="container__graph" />
         <StatusBar />
     </div>
 </template>
@@ -18,12 +18,23 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-    .create-world-container {
+    .container {
         padding: 2em;
         width: 100%;
         height: 100%;
         box-sizing: border-box;
         overflow: auto;
         user-select: none;
+    }
+
+    .container__controls {
+        width: 100%;
+        height: 40px;
+    }
+
+    .container__graph {
+        width: 100%;
+        height: calc(100% - 40px);
+        overflow: hidden;
     }
 </style>
