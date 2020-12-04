@@ -60,29 +60,6 @@ router.put('/users/:id', userAuthMiddleware, function (req, res) {
     );
 });
 
-router.get('/recreate/users', function (req, res) {
-    db.query(sql`DROP TABLE IF EXISTS users`, (err) => {
-        if (err) throw err;
-
-        db.query(sql`
-            CREATE TABLE IF NOT EXISTS users(
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                display_name VARCHAR(255),
-                token VARCHAR(128),
-                token_expires TIMESTAMP,
-                active TINYINT NOT NULL DEFAULT 1,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `, (err, result, fields) => {
-            if (err) throw err;
-
-            res.json({ success: true, data: { result, fields } });
-        });
-    });
-});
-
 /* GET users listing. */
 router.get('/users', function (req, res) {
     res.json({});
