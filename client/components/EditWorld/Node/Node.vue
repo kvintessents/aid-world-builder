@@ -6,7 +6,7 @@
         ref="node"
         @mousedown="dragStart"
     >
-        <NodePreview v-if="previewing" :node="node" />
+        <NodePreview v-if="previewing" :node="node" :type="previewType" />
         <NodeContents v-else :node="node" />
 
         <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
@@ -14,6 +14,7 @@
             <div class="delete" @click="deleteNode">ⓧ</div>
             <div class="minimize" @click="minimizeNode">⊝</div>
             <div class="preview" @click="togglePreview">P</div>
+            <div class="preview-zaltys" @click="togglePreviewZaltys">Z</div>
         </div>
     </div>
 </template>
@@ -35,6 +36,7 @@ export default {
     data() {
         return {
             dragging: false,
+            previewType: 'json',
             previewing: false,
             id: `node-${Math.floor(Math.random() * 1000000)}`
         }
@@ -152,6 +154,11 @@ export default {
             
         },
         togglePreview(event) {
+            this.previewType = 'json';
+            this.previewing = !this.previewing;
+        },
+        togglePreviewZaltys(event) {
+            this.previewType = 'zaltys';
             this.previewing = !this.previewing;
         }
     },
@@ -218,6 +225,13 @@ export default {
 
     .preview {
         left: 2em;
+        top: 0.35em;
+        position: absolute;
+        color: #888;
+    }
+
+    .preview-zaltys {
+        left: 3.3em;
         top: 0.35em;
         position: absolute;
         color: #888;

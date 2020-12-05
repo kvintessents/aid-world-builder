@@ -1,6 +1,6 @@
 <template>
-    <FormWrapper title="Registreeri">
-        <AuthForm @submit="registerUserHandler" buttonLabel="Registreeri" />
+    <FormWrapper title="Register a new account">
+        <AuthForm @submit="registerUserHandler" buttonLabel="Register a new account" />
     </FormWrapper>
 </template>
 

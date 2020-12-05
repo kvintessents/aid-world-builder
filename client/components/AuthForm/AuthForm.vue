@@ -4,7 +4,7 @@
             <Input type="email" v-model="user.email" label="E-mail" />
         </div>
         <div>
-            <Input type="password" v-model="user.password" label="Parool" />
+            <Input type="password" v-model="user.password" label="Password" />
         </div>
         <div>
             <Button type="submit">{{ buttonLabel || 'Submit' }}</Button> 

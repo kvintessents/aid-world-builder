@@ -1,6 +1,6 @@
 <template>
-    <FormWrapper title="Logi sisse">
-        <AuthForm @submit="loginUserHandler" buttonLabel="Logi sisse" />
+    <FormWrapper title="Log in">
+        <AuthForm @submit="loginUserHandler" buttonLabel="Log in" />
     </FormWrapper>
 </template>
 

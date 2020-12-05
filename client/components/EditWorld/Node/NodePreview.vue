@@ -1,20 +1,31 @@
 <template>
     <div class="previewContents">
-        <pre>{{ output }}</pre>
+        <pre class="previewContentsInner">{{ output }}</pre>
     </div>
 </template>
 <script>
 import jsonFormatter from '~/utils/formatters/jsonFormatter';
+import ZaltysFormatter from '~/utils/formatters/ZaltysFormatter';
 
 export default {
     props: {
         node: {
             type: Object,
+        },
+        type: {
+            type: String,
+            default: 'json',
         }
     },
     computed: {
         output() {
-            return jsonFormatter(this.node, { isPreview: true });
+            if (this.type === 'json') {
+                return jsonFormatter(this.node, { isPreview: true });
+            }
+
+            if (this.type === 'zaltys') {
+                return ZaltysFormatter(this.node, { isPreview: true });
+            }
         }
     }
 }

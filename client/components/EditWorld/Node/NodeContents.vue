@@ -8,7 +8,7 @@
             <div class="contents" @mousedown="stopPropagation">
                 <ValueTextarea class="input tags" @input="handleTagsChange" :value="node.tags"  :sizeCacheBreaker="sizeCacheBreaker" />
 
-                <table class="attributes">
+                <table v-if="node.properties.length" class="attributes">
                     <tbody>
                         <tr
                             v-for="(attribute, index) in node.properties"
@@ -37,6 +37,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <div v-else class="add-first-trait"><Button tiny create @click="appendFirstProperty">+ Add trait</Button></div>
             </div>
         </section>
 
@@ -49,9 +50,10 @@
 <script>
 import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
 import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
+import Button from '~/components/core/atoms/Button';
 
 export default {
-    components: { NodeLabelControl, ValueTextarea },
+    components: { NodeLabelControl, ValueTextarea, Button },
     props: {
         node: {
             type: Object,
@@ -115,7 +117,7 @@ export default {
             const lastIndex = this.node.properties.length - 1;
 
             if (index === lastIndex) {
-                this.$store.commit('world/appendNewProperty', this.node);
+                this.$store.commit('world/appendNewProperty', { node: this.node });
             }
 
             return true;
@@ -141,6 +143,12 @@ export default {
         },
         stopPropagation(event) {
             event.stopPropagation();
+        },
+        appendFirstProperty() {
+            this.$store.commit('world/appendNewProperty', {
+                node: this.node,
+                initValue: { key: 'trait', value: 'value' }
+            });
         }
     },
 }
@@ -219,5 +227,9 @@ export default {
 
     .tags {
         margin: 1em 0;
+    }
+
+    .add-first-trait {
+        text-align: center;
     }
 </style>

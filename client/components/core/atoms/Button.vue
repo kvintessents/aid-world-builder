@@ -39,4 +39,12 @@ export default {
     .button[small] {
         padding: 0.5em 1em;
     }
+
+    .button[tiny] {
+        padding: 0.25em 0.5em;
+    }
+
+    .button[create] {
+        background-color: #13bb5e;
+    }
 </style>

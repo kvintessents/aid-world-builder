@@ -150,10 +150,10 @@ export const mutations = {
             state.nodes[nodeIndex].properties[index].key = key;
         }
     },
-    appendNewProperty(state, node) {
+    appendNewProperty(state, { node, initValue }) {
         const index = state.nodes.indexOf(node);
 
-        state.nodes[index].properties.push({key: '', value: ''})
+        state.nodes[index].properties.push(initValue ? initValue : {key: '', value: ''})
     },
     removeProperty(state, { node, propertyIndex }) {
         if (propertyIndex === undefined) {
