@@ -1,5 +1,5 @@
 <template>
-    <button
+    <component :is="tagType"
         class="button"
         :class="{
             loading: loading
@@ -7,7 +7,7 @@
 
         v-on="$listeners"
         v-bind="$attrs"
-    ><slot></slot></button>
+    ><slot></slot></component>
 </template>
 
 <script>
@@ -17,6 +17,15 @@ export default {
             type: Boolean,
             required: false,
         },
+        link: {
+            type: Boolean,
+            default: false,
+        }
+    },
+    computed: {
+        tagType() {
+            return this.link ? 'a' : 'button';
+        }
     },
     inheritAttrs: false,
 }
@@ -30,6 +39,7 @@ export default {
         padding: 1em 2em;
         color: #fff;
         font-size: 1em;
+        text-decoration: none;
     }
 
     .button[disabled] {

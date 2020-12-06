@@ -211,14 +211,15 @@ export default {
     }
 
     .column-key {
-        padding: 0.5em;
+        padding: 0.25em 0.5em;
         padding-right: 0;
-        width: 32%;
+        width: 20%;
+        min-width: 6em;
     }
 
     .column-value {
-        padding: 0.5em;
-        width: 68%;
+        padding: 0.25em 0.5em;
+        width: 80%;
     }
 
     .key {
@@ -231,5 +232,9 @@ export default {
 
     .add-first-trait {
         text-align: center;
+    }
+
+    .value {
+        line-height: 1.5em;
     }
 </style>

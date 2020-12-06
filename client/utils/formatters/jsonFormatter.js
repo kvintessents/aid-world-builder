@@ -1,3 +1,5 @@
+import traitSplitter from '~/utils/formatters/traitSplitter';
+
 function getEntry(node) {
     return [{
         [node.name]: node.properties.reduce((acc, property) => {
@@ -9,6 +11,6 @@ function getEntry(node) {
 export default (node, { isPreview }) => ({
     id: node.randomId,
     keys: node.tags,
-    entry: isPreview ? getEntry(node) : JSON.stringify(getEntry(node)),
+    entry: isPreview ? getEntry(traitSplitter(node)) : JSON.stringify(getEntry(traitSplitter(node))),
     isNotHidden: true
 })

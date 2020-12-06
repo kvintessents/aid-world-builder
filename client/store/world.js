@@ -2,9 +2,12 @@ import Vue from 'vue';
 
 async function syncronizeState($axios, state) {
     const document = { ...state };
-    delete document.syncingCalls;
 
-    const body = { document: JSON.stringify(document), version: Date.now() };
+    // These value only exist in the front end
+    delete document.syncingCalls;
+    delete document.isOwner;
+
+    const body = { document: JSON.stringify(document), version: Date.now(), isPublic: document.isPublic };
 
     return await $axios.post(`/world/${state.id}`, body);
 }
@@ -31,7 +34,7 @@ function debounceFunction(fn, ms) {
                     toReject.map(rejectFn => rejectFn(e));
                     toReject = [];
                 }
-            }, ms)
+            }, ms);
         })
     }
 }
@@ -43,10 +46,14 @@ export const state = () => ({
     nodes: [],
     lastId: 0,
     syncingCalls: 0,
+    isOwner: false,
+    isNodeView: false,
+    isPublic: false,
 });
 
 export const mutations = {
     setWorld(state, world) {
+        const currentUserId = this.$auth.user && this.$auth.user.id;
         const document = JSON.parse(world.document);
         document.nodes = document.nodes.map(node => {
             return {
@@ -58,6 +65,7 @@ export const mutations = {
         });
         Object.assign(state, document);
         state.id = world.id;
+        state.isOwner = !!(currentUserId && world.user_id && (parseInt(world.user_id) === parseInt(currentUserId)));
     },
     addNode(state, position, size) {
         state.lastId += 1;
@@ -87,7 +95,6 @@ export const mutations = {
     },
     deleteNode(state, nodeToDelete) {
         state.nodes = state.nodes.filter(node => {
-            console.log(node !== nodeToDelete);
             return node !== nodeToDelete
         });
     },
@@ -191,7 +198,13 @@ export const mutations = {
         for (const node of state.nodes) {
             node.selected = false;
         }
-    }
+    },
+    setNodeView(state, isNodeView) {
+        state.isNodeView = isNodeView;
+    },
+    setPublic(state, isPublic) {
+        state.isPublic = isPublic;
+    },
 };
 
 export const actions = {
@@ -208,11 +221,15 @@ export const actions = {
         dispatch('sync');
     },
     async sync({ commit, state }) {
+        if (!state.isOwner) {
+            return;
+        }
+
         commit('startSync');
         await synchronize(this.$axios, state);
         commit('stopSync');
     },
-    async fetchWorld({ commit, state }, id) {
+    async fetchWorld({ commit, state, auth, $auth }, id) {
         const result = await this.$axios.get(`worlds/${id}`);
         const world = result.data.data;
         commit('setWorld', world);
@@ -239,6 +256,14 @@ export const actions = {
     },
     async minimizeNode({ commit, dispatch }, args) {
         commit('minimizeNode', args);
+        dispatch('sync');
+    },
+    async setNodeView({ commit, dispatch }, args) {
+        commit('setNodeView', args);
+        dispatch('sync');
+    },
+    async setPublic({ commit, dispatch }, args) {
+        commit('setPublic', args);
         dispatch('sync');
     },
 }

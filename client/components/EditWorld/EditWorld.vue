@@ -1,7 +1,10 @@
 <template>
     <div class="container">
         <GraphControls class="container__controls" />
-        <Graph class="container__graph" />
+
+        <Graph v-if="nodeView" class="container__graph" />
+        <List v-else class="container__list" />
+
         <StatusBar />
     </div>
 </template>
@@ -10,9 +13,15 @@
 import GraphControls from '~/components/EditWorld/GraphControls';
 import StatusBar from '~/components/EditWorld/StatusBar';
 import Graph from '~/components/EditWorld/Graph';
+import List from '~/components/EditWorld/List';
 
 export default {
-    components: { GraphControls, Graph, StatusBar },
+    components: { GraphControls, Graph, StatusBar, List },
+    computed: {
+        nodeView() {
+            return this.$store.state.world.isNodeView;
+        }
+    },
     methods: {
     }
 }
@@ -24,7 +33,6 @@ export default {
         height: 100%;
         box-sizing: border-box;
         overflow: auto;
-        user-select: none;
     }
 
     .container__controls {
@@ -36,5 +44,6 @@ export default {
         width: 100%;
         height: calc(100% - 40px);
         overflow: hidden;
+        user-select: none;
     }
 </style>

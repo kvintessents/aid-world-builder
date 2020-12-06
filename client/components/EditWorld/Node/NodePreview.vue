@@ -20,11 +20,11 @@ export default {
     computed: {
         output() {
             if (this.type === 'json') {
-                return jsonFormatter(this.node, { isPreview: true });
+                return jsonFormatter(this.node, { isPreview: true }).entry;
             }
 
             if (this.type === 'zaltys') {
-                return ZaltysFormatter(this.node, { isPreview: true });
+                return ZaltysFormatter(this.node, { isPreview: true }).entry;
             }
         }
     }
@@ -34,5 +34,10 @@ export default {
     .previewContents {
         padding: 1em;
         overflow: auto;
+    }
+
+    .previewContentsInner {
+        white-space: break-spaces;
+        user-select: initial;
     }
 </style>

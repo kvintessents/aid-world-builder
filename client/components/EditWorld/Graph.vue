@@ -1,7 +1,7 @@
 <template>
     <div class="graph" ref="graph" :style="style">
         <div :style="offsetStyle">
-            <Node v-for="node in $store.state.world.nodes" :key="node.id" :node="node" />
+            <Node v-for="node in $store.state.world.nodes" :key="node.id" :node="node" :positioned="true" />
             <div v-if="selecting" class="selection" :style="selectionStyle"></div>
         </div>
     </div>

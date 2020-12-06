@@ -1,7 +1,7 @@
 <template>
     <div
         class="Node"
-        :class="{ selected: node.selected }"
+        :class="{ selected: node.selected, positioned: positioned, minimized: node.minimized }"
         :style="style"
         ref="node"
         @mousedown="dragStart"
@@ -10,7 +10,7 @@
         <NodeContents v-else :node="node" />
 
         <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
-            <div class="resize" @mousedown="resizeStart"></div>
+            <div class="resize" @mousedown="resizeStart" v-if="positioned"></div>
             <div class="delete" @click="deleteNode">ⓧ</div>
             <div class="minimize" @click="minimizeNode">⊝</div>
             <div class="preview" @click="togglePreview">P</div>
@@ -32,6 +32,10 @@ export default {
             type: Object,
             required: true,
         },
+        positioned: {
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         return {
@@ -43,7 +47,16 @@ export default {
     },
     computed: {
         style() {
+            if (!this.positioned) {
+                return {
+                    position: 'relative',
+                    'margin-bottom': '1em',
+                    'margin-right': '1em',
+                };
+            }
+
             const style = {
+                position: 'absolute',
                 left: `${this.node.position.x}px`,
                 top: `${this.node.position.y}px`,
             };
@@ -63,6 +76,10 @@ export default {
     },
     methods: {
         dragStart(event) {
+            if (!this.positioned) {
+                return;
+            }
+
             this.dragging = true;
             window.addEventListener('mousemove', this.reposition);
             window.addEventListener('mouseup', this.dragStop);
@@ -148,10 +165,12 @@ export default {
         minimizeNode(event) {
             event.stopPropagation();
             this.$store.dispatch('world/minimizeNode', this.node);
-            setTimeout(() => {
-                this.syncNodeHeight();
-            }, 100);
-            
+
+            if (this.positioned) {
+                setTimeout(() => {
+                    this.syncNodeHeight();
+                }, 100);
+            }
         },
         togglePreview(event) {
             this.previewType = 'json';
@@ -170,16 +189,22 @@ export default {
     .Node {
         background: #fff;
         border: 1px solid #ccc;
-        position: absolute;
-        cursor: grab;
-        user-select: none;
         box-shadow: 0 5px 10px #00000020;
         border-radius: 0.4em;
         box-sizing: border-box;
     }
 
+    .Node.positioned {
+        cursor: grab;
+        user-select: none;
+    }
+
     .Node.selected {
         border: 1px solid #000;
+    }
+
+    .Node.minimized {
+        height: 46px;
     }
 
     .input {
@@ -199,9 +224,9 @@ export default {
         width: 5px;
     }
 
-    .hover-controls {
-        display: none;
-    }
+    // .hover-controls {
+    //     display: none;
+    // }
 
     .Node:hover .hover-controls {
         display: block;

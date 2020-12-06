@@ -6,15 +6,25 @@ const sql = require('sql-template-strings');
 const { promisify } = require('util');
 const { celebrate, Joi } = require('celebrate');
 const userAuth = require('../middlewares/userAuth.middleware');
+const { escape } = require('sqlstring');
 
 const query = promisify(db.query).bind(db);
 
-async function saveWorld({ id, version, document }) {
-    const result = await query(sql`
+async function saveWorld({ id, version, document, userId, isPublic }) {
+    let publicTerm = '';
+
+    if (typeof isPublic === 'boolean') {
+        publicTerm = `, is_public = ${isPublic ? 1 : 0}`
+    }
+
+    const command = `
         UPDATE worlds
-        SET document = ${document}
-        WHERE id = ${id};
-    `);
+        SET
+            document = ${escape(document)} ${publicTerm}
+        WHERE id = ${escape(id)} AND user_id = ${parseInt(userId)};
+    `;
+
+    const result = await query(command);
 
     return result;
 }
@@ -52,9 +62,15 @@ router.get('/worlds/', userAuth, celebrate({
 }));
 
 router.get('/worlds/:id', userAuth, asyncRoute(async function (req, res) {
+    const userId = res.locals.user && res.locals.user.id ? parseInt(res.locals.user.id) : null;
+
     const result = await query(sql`
-        SELECT * FROM worlds WHERE id = ${req.params.id}
+        SELECT * FROM worlds WHERE id = ${req.params.id} AND (user_id = ${userId} OR is_public = 1)
     `);
+
+    if (!result || !result[0]) {
+        return res.status(404).json({ success: false });
+    }
 
     res.json({ success: true, data: result[0] });
 }));
@@ -86,14 +102,21 @@ router.post('/world/:id', userAuth, celebrate({
     },
     body: Joi.object().keys({
         document: Joi.string().required(),
+        isPublic: Joi.boolean().default(null),
         version: Joi.number().required(),
     }),
 }), asyncRoute(async function (req, res) {
-    const { version, document } = req.body;
+    if (!res.locals.user || !res.locals.user.id) {
+        return res.status(403).json({ success: false })
+    }
+
+    const { version, document, isPublic } = req.body;
 
     const result = await saveWorld({
         id: req.params.id,
+        userId: res.locals.user.id,
         version,
+        isPublic,
         document
     });
 

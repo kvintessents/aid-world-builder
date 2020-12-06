@@ -1,6 +1,8 @@
+import traitSplitter from '~/utils/formatters/traitSplitter';
+
 function getEntry(node) {
     const traits = node.properties.map(trait => {
-        const values = trait.value.split(',').map(s => s.trim()).join('/');
+        const values = trait.value.join('/');
         const key = trait.key.trim().toUpperCase();
 
         if (!key) {
@@ -10,11 +12,12 @@ function getEntry(node) {
         return `${key}<${node.name}>:${values}`;
     }).join(';');
 
-    return `${node.name}:[${traits}]`
+    return `${node.name}:[${traits}.]`
 }
+
 export default (node, { isPreview }) => ({
     id: node.randomId,
     keys: node.tags,
-    entry: getEntry(node),
+    entry: getEntry(traitSplitter(node)),
     isNotHidden: true
 })
