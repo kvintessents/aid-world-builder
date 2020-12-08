@@ -44,17 +44,26 @@ async function createWorld({ name, isPublic, userId }) {
     `);
 }
 
-router.get('/worlds/', userAuth, celebrate({
-    params: Joi.object().keys({
-        user_id: Joi.number().default(null),
-    }),
-}), asyncRoute(async function (req, res) {
+router.get('/worlds/', userAuth, asyncRoute(async function (req, res) {
     const userId = res.locals.user.id;
+
     const result = await query(sql`
         SELECT
             id, name, is_public, user_id, version, created_at
         FROM worlds
         WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+    `);
+
+    res.json({ success: true, data: result });
+}));
+
+router.get('/public-worlds/', asyncRoute(async function (req, res) {
+    const result = await query(sql`
+        SELECT
+            id, name, is_public, user_id, version, created_at
+        FROM worlds
+        WHERE is_public = 1
         ORDER BY created_at DESC
     `);
 

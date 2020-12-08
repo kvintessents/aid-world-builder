@@ -36,7 +36,17 @@
                     user_id: $auth.user.id
                 }
             });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error('Error fetching user worlds', e); }
+
+        return response.data.data;
+    }
+
+    async function fetchPublicWorlds($axios) {
+        let response;
+
+        try {
+            response = await $axios.get('/public-worlds/');
+        } catch (e) { console.error('Error fetching public worlds', e); }
 
         return response.data.data;
     }
@@ -49,12 +59,14 @@
                 creating: false,
                 worldName: '',
                 worlds: [],
+                publicWorlds: [],
             };
         },
         computed: {},
         async asyncData({ $axios, $auth }) {
             const worlds = await fetchWorlds($axios, $auth);
-            return { worlds };
+            const publicWorlds = await fetchPublicWorlds($axios);
+            return { worlds, publicWorlds };
         },
         methods: {
             async onSubmit() {
@@ -68,6 +80,7 @@
                     });
 
                     this.worlds = await fetchWorlds(this.$axios, this.$auth);
+                    this.publicWorlds = await fetchPublicWorlds(this.$axios);
                 } catch (e) { console.error(e); }
 
                 this.creating = false;

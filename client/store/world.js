@@ -74,7 +74,7 @@ export const mutations = {
             position = { x: 0, y: 0 };
         }
 
-        state.nodes.push({
+        state.nodes.push(Vue.observable({
             id: state.lastId,
             randomId: `${Math.random()}`,
             position: position,
@@ -91,7 +91,7 @@ export const mutations = {
                 { key: "hair color", value: "auburn" },
                 { key: "hair length", value: "long" },
             ]
-        });
+        }));
     },
     deleteNode(state, nodeToDelete) {
         state.nodes = state.nodes.filter(node => {
@@ -160,7 +160,7 @@ export const mutations = {
     appendNewProperty(state, { node, initValue }) {
         const index = state.nodes.indexOf(node);
 
-        state.nodes[index].properties.push(initValue ? initValue : {key: '', value: ''})
+        state.nodes[index].properties.push(initValue ? initValue : Vue.observable({key: '', value: ''}))
     },
     removeProperty(state, { node, propertyIndex }) {
         if (propertyIndex === undefined) {
@@ -205,6 +205,20 @@ export const mutations = {
     setPublic(state, isPublic) {
         state.isPublic = isPublic;
     },
+    duplicateNode(state, node) {
+        const i = state.nodes.indexOf(node);
+        const copy = JSON.parse(JSON.stringify(node));
+
+        copy.id = ++state.lastId;
+        copy.randomId = `${Math.random()}`;
+        copy.name = `${copy.name} (copy)`;
+
+        state.nodes = [
+            ...state.nodes.slice(0, i + 1),
+            Vue.observable(copy),
+            ...state.nodes.slice(i + 1)
+        ];
+    }
 };
 
 export const actions = {
@@ -264,6 +278,10 @@ export const actions = {
     },
     async setPublic({ commit, dispatch }, args) {
         commit('setPublic', args);
+        dispatch('sync');
+    },
+    async duplicateNode({ commit, dispatch }, args) {
+        commit('duplicateNode', args);
         dispatch('sync');
     },
 }

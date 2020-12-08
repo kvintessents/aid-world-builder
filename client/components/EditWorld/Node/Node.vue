@@ -15,6 +15,7 @@
             <div class="minimize" @click="minimizeNode">⊝</div>
             <div class="preview" @click="togglePreview">P</div>
             <div class="preview-zaltys" @click="togglePreviewZaltys">Z</div>
+            <div class="duplicate-node" @click="duplicateNode"></div>
         </div>
     </div>
 </template>
@@ -179,6 +180,9 @@ export default {
         togglePreviewZaltys(event) {
             this.previewType = 'zaltys';
             this.previewing = !this.previewing;
+        },
+        duplicateNode(event) {
+            this.$store.dispatch('world/duplicateNode', this.node);
         }
     },
 }
@@ -260,5 +264,16 @@ export default {
         top: 0.35em;
         position: absolute;
         color: #888;
+    }
+
+    .duplicate-node {
+        left: 4.7em;
+        top: 0.35em;
+        position: absolute;
+        color: #888;
+        width: 16px;
+        height: 16px;
+        background: url('~assets/copy.png');
+        background-size: 16px 16px;
     }
 </style>
