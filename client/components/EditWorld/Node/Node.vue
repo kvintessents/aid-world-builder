@@ -11,11 +11,11 @@
 
         <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
             <div class="resize" @mousedown="resizeStart" v-if="positioned"></div>
-            <div class="delete" @click="deleteNode">ⓧ</div>
-            <div class="minimize" @click="minimizeNode">⊝</div>
-            <div class="preview" @click="togglePreview">P</div>
-            <div class="preview-zaltys" @click="togglePreviewZaltys">Z</div>
-            <div class="duplicate-node" @click="duplicateNode"></div>
+            <div class="delete" @click="deleteNode" title="Delete">ⓧ</div>
+            <div class="minimize" @click="minimizeNode" title="Minimize">⊝</div>
+            <div class="preview" @click="togglePreview" title="Preview in JSON format">P</div>
+            <div class="preview-zaltys" @click="togglePreviewZaltys" title="Preview in Zaltys format (recommended)">Z</div>
+            <div class="duplicate-node" @click="duplicateNode" title="Duplicate"></div>
         </div>
     </div>
 </template>

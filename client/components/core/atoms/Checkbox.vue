@@ -1,5 +1,5 @@
 <template>
-    <label>
+    <label :title="title">
         <input
             type="checkbox"
             class="checkbox"
@@ -18,6 +18,10 @@ export default {
             type: String,
             required: true,
         },
+        title: {
+            type: String,
+            default: null,
+        }
     },
     inheritAttrs: false,
 }

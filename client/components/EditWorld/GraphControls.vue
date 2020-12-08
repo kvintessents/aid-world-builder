@@ -1,12 +1,24 @@
 <template>
     <nav class="graph-controls">
         <ul class="list">
-            <li class="list-item" v-if="isOwner"><Button small create @click="$store.dispatch('world/addNode')">Add Entry</Button></li>
-            <li class="list-item"><Button link small download="AID-WORLD.json" :href="jsonContents">Download JSON</Button></li>
-            <li class="list-item"><Button link small download="AID-WORLD.json" :href="zaltysContents">Download Zaltys</Button></li>
-            <li class="list-item"><Checkbox label="Node view" @click="setNodeView" :checked="$store.state.world.isNodeView" /></li>
-            <li class="list-item" v-if="isOwner"><Checkbox label="Public" @click="setPublic" :checked="$store.state.world.isPublic" /></li>
-            <li class="list-item" v-if="!isOwner"><span class="read-only">Read only mode</span></li>
+            <li class="list-item" v-if="isOwner">
+                <Button small create @click="$store.dispatch('world/addNode')">Add Entry</Button>
+            </li>
+            <li class="list-item">
+                <Button link small download="AID-WORLD.json" :href="zaltysContents" title="Download in Zaltys format (recommended)">Download Zaltys</Button>
+            </li>
+            <li class="list-item">
+                <Button link small download="AID-WORLD.json" :href="jsonContents" title="Download in JSON format (not recommended for now)">Download JSON</Button>
+            </li>
+            <li class="list-item">
+                <Checkbox label="Node view" @click="setNodeView" :checked="$store.state.world.isNodeView" />
+            </li>
+            <li class="list-item" v-if="isOwner">
+                <Checkbox label="Publicly viewable" @click="setPublic" :checked="$store.state.world.isPublic" title="If checked, any non-registered user will be able to view this board, but not be able to edit it." />
+            </li>
+            <li class="list-item" v-if="!isOwner">
+                <span class="read-only">Read only mode</span>
+            </li>
         </ul>
     </nav>
 </template>
