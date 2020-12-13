@@ -55,11 +55,14 @@ export const mutations = {
     setWorld(state, world) {
         const currentUserId = this.$auth.user && this.$auth.user.id;
         const document = JSON.parse(world.document);
+        let index = 0;
+
         document.nodes = document.nodes.map(node => {
             return {
                 size: null,
                 minimized: false,
                 selected: false,
+                order: index++,
                 ...node,
             }
         });
@@ -67,7 +70,7 @@ export const mutations = {
         state.id = world.id;
         state.isOwner = !!(currentUserId && world.user_id && (parseInt(world.user_id) === parseInt(currentUserId)));
     },
-    addNode(state, position, size) {
+    addNode(state, position) {
         state.lastId += 1;
 
         if (!position) {
@@ -213,12 +216,32 @@ export const mutations = {
         copy.randomId = `${Math.random()}`;
         copy.name = `${copy.name} (copy)`;
 
-        state.nodes = [
+        state.nodes = Vue.observable([
             ...state.nodes.slice(0, i + 1),
             Vue.observable(copy),
             ...state.nodes.slice(i + 1)
-        ];
-    }
+        ]);
+    },
+    reorderNode(state, { node, targetIndex }) {
+        const currentIndex = state.nodes.indexOf(node);
+
+        if (currentIndex === targetIndex) {
+            return;
+        }
+
+        if (targetIndex === state.nodes.length) {
+            state.nodes = state.nodes.filter(n => n !== node);
+            state.nodes.push(node);
+        } else {
+            let left = state.nodes.slice(0, targetIndex).filter(n => n !== node);
+            let right = state.nodes.slice(targetIndex).filter(n => n !== node);
+
+            state.nodes = Vue.observable([ ...left, node, ...right ]);
+        }
+
+        // Updates order values
+        state.nodes.forEach((n, i) => n.order = parseInt(i, 10));
+    },
 };
 
 export const actions = {
@@ -282,6 +305,10 @@ export const actions = {
     },
     async duplicateNode({ commit, dispatch }, args) {
         commit('duplicateNode', args);
+        dispatch('sync');
+    },
+    async reorderNode({ commit, dispatch }, args) {
+        commit('reorderNode', args);
         dispatch('sync');
     },
 }

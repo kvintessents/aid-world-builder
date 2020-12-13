@@ -1,10 +1,10 @@
 <template>
     <div
         class="Node"
-        :class="{ selected: node.selected, positioned: positioned, minimized: node.minimized }"
+        :class="{ selected: node.selected, positioned: positioned, minimized: node.minimized, reordering: reordering }"
         :style="style"
         ref="node"
-        @mousedown="dragStart"
+        @mousedown="onMouseDown"
     >
         <NodePreview v-if="previewing" :node="node" :type="previewType" />
         <NodeContents v-else :node="node" />
@@ -41,6 +41,8 @@ export default {
     data() {
         return {
             dragging: false,
+            reordering: false,
+            dropoffPoints: null,
             previewType: 'json',
             previewing: false,
             id: `node-${Math.floor(Math.random() * 1000000)}`
@@ -76,16 +78,26 @@ export default {
         }
     },
     methods: {
-        dragStart(event) {
-            if (!this.positioned) {
-                return;
-            }
+        onMouseDown(event) {
+            event.stopPropagation();
 
+            if (this.positioned) {
+                this.dragStart(event);
+            } else {
+                this.$emit('reorderStart', {
+                    node: this.node,
+                    event: event,
+                    component: this,
+                });
+            }
+        },
+
+        // NODE VIEW DRAGGING
+        dragStart(event) {
             this.dragging = true;
             window.addEventListener('mousemove', this.reposition);
             window.addEventListener('mouseup', this.dragStop);
             this.sendToTop();
-            event.stopPropagation();
         },
         dragStop(event) {
             this.dragging = false;
@@ -102,6 +114,8 @@ export default {
                 position: { x: event.movementX, y: event.movementY }
             });
         },
+
+        // NODE VIEW RESIZING
         resizeStart(event) {
             event.stopPropagation();
             this.resizing = true;
@@ -196,10 +210,10 @@ export default {
         box-shadow: 0 5px 10px #00000020;
         border-radius: 0.4em;
         box-sizing: border-box;
+        cursor: grab;
     }
 
     .Node.positioned {
-        cursor: grab;
         user-select: none;
     }
 
@@ -228,10 +242,6 @@ export default {
         width: 5px;
     }
 
-    // .hover-controls {
-    //     display: none;
-    // }
-
     .Node:hover .hover-controls {
         display: block;
         cursor: pointer;
@@ -253,27 +263,28 @@ export default {
     }
 
     .preview {
+        position: absolute;
         left: 2em;
         top: 0.35em;
-        position: absolute;
         color: #888;
     }
 
     .preview-zaltys {
+        position: absolute;
         left: 3.3em;
         top: 0.35em;
-        position: absolute;
         color: #888;
     }
 
     .duplicate-node {
+        position: absolute;
         left: 4.7em;
         top: 0.35em;
-        position: absolute;
         color: #888;
         width: 16px;
         height: 16px;
         background: url('~assets/copy.png');
         background-size: 16px 16px;
     }
+
 </style>

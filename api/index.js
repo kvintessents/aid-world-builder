@@ -22,6 +22,7 @@ app.use(require('./routes/upvotes'));
 app.use(require('./routes/comments'));
 app.use(require('./routes/test'));
 app.use(require('./routes/worlds'));
+app.use(require('./routes/feedback'));
 
 app.use(require('./routes/thumbnails'));
 

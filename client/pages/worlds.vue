@@ -1,6 +1,6 @@
 <template>
     <div class="worlds">
-        <Paper padded-2 class="create-world">
+        <Paper v-if="$auth.user" padded-2 class="create-world">
             <form @submit.prevent="onSubmit" :disabled="creating">
                 <FormRow>
                     <Input label="New World Name" v-model="worldName" />
@@ -8,15 +8,24 @@
                 </FormRow>
             </form>
         </Paper>
-        <Paper v-if="worlds.length" padded-2 class="world-list-paper" >
-            <ol class="world-list">
+
+        <Paper v-if="$auth.user" padded-2 class="world-list-paper" >
+            <h2>Your worlds</h2>
+            <ol v-if="worlds.length" class="world-list">
                 <li class="world-list-element" v-for="world in worlds" :key="world.id">
                     <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
                 </li>
             </ol>
+            <p v-else>Your worlds will appear here.</p>
         </Paper>
-        <Paper v-else padded-2 class="no-worlds">
-            Your worlds will appear here.
+
+        <Paper v-if="publicWorlds.length" padded-2 class="world-list-paper" >
+            <h2>Publicly viewable worlds</h2>
+            <ol class="world-list">
+                <li class="world-list-element" v-for="world in publicWorlds" :key="world.id">
+                    <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
+                </li>
+            </ol>
         </Paper>
     </div>
 </template>
@@ -28,6 +37,10 @@
     import Button from '~/components/core/atoms/Button';
 
     async function fetchWorlds($axios, $auth) {
+        if (!$auth.user) {
+            return [];
+        }
+
         let response;
 
         try {
@@ -94,12 +107,8 @@
         margin: 0 auto;
     }
 
-    .world-list-paper, .create-world, .no-worlds {
+    .world-list-paper, .create-world {
         margin-top: 2em;
-    }
-
-    .no-worlds {
-        text-align: center;
     }
 
     .world-list {
