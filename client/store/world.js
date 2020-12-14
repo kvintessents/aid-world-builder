@@ -242,6 +242,23 @@ export const mutations = {
         // Updates order values
         state.nodes.forEach((n, i) => n.order = parseInt(i, 10));
     },
+    reorderNodeAttribute(state, { node, currentIndex, targetIndex }) {
+        const currentAttribute = node.properties[currentIndex];
+
+        if (currentIndex === targetIndex) {
+            return;
+        }
+
+        if (targetIndex === node.properties.length) {
+            node.properties = node.properties.filter(x => x !== currentAttribute);
+            node.properties.push(currentAttribute);
+        } else {
+            let left = node.properties.slice(0, targetIndex).filter(x => x !== currentAttribute);
+            let right = node.properties.slice(targetIndex).filter(x => x !== currentAttribute);
+
+            node.properties = Vue.observable([ ...left, currentAttribute, ...right ]);
+        }
+    }
 };
 
 export const actions = {
@@ -309,6 +326,10 @@ export const actions = {
     },
     async reorderNode({ commit, dispatch }, args) {
         commit('reorderNode', args);
+        dispatch('sync');
+    },
+    async reorderNodeAttribute({ commit, dispatch }, args) {
+        commit('reorderNodeAttribute', args);
         dispatch('sync');
     },
 }

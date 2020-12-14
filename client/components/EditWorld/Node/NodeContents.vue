@@ -6,38 +6,18 @@
 
         <section class="body" :class="{ minimized: node.minimized }">
             <div class="contents" @mousedown="stopPropagation">
-                <ValueTextarea class="input tags" @input="handleTagsChange" :value="node.tags"  :sizeCacheBreaker="sizeCacheBreaker" />
+                <ValueTextarea
+                    class="input tags"
+                    @input="handleTagsChange"
+                    :value="node.tags"
+                    :sizeCacheBreaker="sizeCacheBreaker"
+                />
 
-                <table v-if="node.properties.length" class="attributes">
-                    <tbody>
-                        <tr
-                            v-for="(attribute, index) in node.properties"
-                            :key="`${id}#${index}`"
-                            class="attribute"
-                        >
-                            <td class="column-key">
-                                <ValueTextarea
-                                    class="input key"
-                                    :property-index="index"
-                                    @input="handleKeyChange"
-                                    @keydown="onValueKeyDown"
-                                    :value="attribute.key"
-                                    :sizeCacheBreaker="sizeCacheBreaker" />
-                            </td>
-                            <td class="column-value">
-                                <ValueTextarea
-                                    class="input value"
-                                    :property-index="index"
-                                    @input="handleValueChange"
-                                    @keydown="onKeyKeyDown"
-                                    :value="attribute.value"
-                                    :sizeCacheBreaker="sizeCacheBreaker"
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div v-else class="add-first-trait"><Button tiny create @click="appendFirstProperty">+ Add trait</Button></div>
+                <NodeAttributes v-if="node.properties.length" :node="node" />
+
+                <div v-else class="add-first-trait">
+                    <Button tiny create @click="appendFirstProperty">+ Add trait</Button>
+                </div>
             </div>
         </section>
 
@@ -51,9 +31,10 @@
 import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
 import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
 import Button from '~/components/core/atoms/Button';
+import NodeAttributes from '~/components/EditWorld/Node/NodeAttributes';
 
 export default {
-    components: { NodeLabelControl, ValueTextarea, Button },
+    components: { NodeLabelControl, ValueTextarea, Button, NodeAttributes },
     props: {
         node: {
             type: Object,
@@ -66,8 +47,7 @@ export default {
     },
     data() {
         return {
-            dragging: false,
-            id: `node-${Math.floor(Math.random() * 1000000)}`
+            dragging: false
         }
     },
     computed: {
@@ -93,53 +73,6 @@ export default {
                 node: this.node,
                 attributes: { tags: event.target.value }
             });
-        },
-        handleKeyChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: event.target.getAttribute('property-index'),
-                key: event.target.value
-            });
-        },
-        handleValueChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: event.target.getAttribute('property-index'),
-                value: event.target.value
-            });
-        },
-        onKeyKeyDown(event) {
-            if (event.key !== 'Tab') {
-                return true;
-            }
-
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
-            const lastIndex = this.node.properties.length - 1;
-
-            if (index === lastIndex) {
-                this.$store.commit('world/appendNewProperty', { node: this.node });
-            }
-
-            return true;
-        },
-        onValueKeyDown(event) {
-            if (event.key !== 'Backspace') {
-                return true;
-            }
-
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
-
-            if (
-                this.node.properties[index].value.trim() === '' &&
-                this.node.properties[index].key.trim() === ''
-            ) {
-                this.$store.dispatch('world/removeProperty', {
-                    node: this.node,
-                    propertyIndex: index
-                });
-            }
-
-            return true;
         },
         stopPropagation(event) {
             event.stopPropagation();
@@ -191,50 +124,15 @@ export default {
     }
 
     .name {
-        width: 100%;
         text-align: center;
     }
 
     .tags {
         text-align: center;
-    }
-
-    .attributes {
-        padding: 0;
-        margin: 0;
-        border-spacing: 0;
-        width: 100%;
-    }
-
-    .attributes tr:nth-child(odd) {
-        background: rgba(0, 0, 0, 0.03);
-    }
-
-    .column-key {
-        padding: 0.25em 0.5em;
-        padding-right: 0;
-        width: 20%;
-        min-width: 6em;
-    }
-
-    .column-value {
-        padding: 0.25em 0.5em;
-        width: 80%;
-    }
-
-    .key {
-        font-weight: 600;
-    }
-
-    .tags {
         margin: 1em 0;
     }
 
     .add-first-trait {
         text-align: center;
-    }
-
-    .value {
-        line-height: 1.5em;
     }
 </style>
