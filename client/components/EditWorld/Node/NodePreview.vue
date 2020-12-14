@@ -1,5 +1,5 @@
 <template>
-    <div class="previewContents">
+    <div class="previewContents" @click="stopPropagation" @mousedown="stopPropagation">
         <pre class="previewContentsInner">{{ output }}</pre>
     </div>
 </template>
@@ -27,6 +27,11 @@ export default {
                 return ZaltysFormatter(this.node, { isPreview: true }).entry;
             }
         }
+    },
+    methods: {
+        stopPropagation(event) {
+            event.stopPropagation();
+        }
     }
 }
 </script>
@@ -38,6 +43,7 @@ export default {
 
     .previewContentsInner {
         white-space: break-spaces;
-        user-select: initial;
+        user-select: text;
+        cursor: text;
     }
 </style>
