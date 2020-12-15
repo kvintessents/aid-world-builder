@@ -11,7 +11,7 @@
                     :data-order="index"
                     ref="nodeRefs"
                     @startReorder="reorderStart"
-                    :sizeCacheBreaker="sizeCacheBreaker"
+                    :sizeCacheBreaker="sizeCacheBreakerAdded"
                 />
             </tbody>
         </table>
@@ -49,7 +49,8 @@ export default {
             reorderBox: null,
             reorderingAttribute: null,
             dropoffPoints: [],
-            id: `node-${Math.floor(Math.random() * 1000000)}`
+            id: `node-${Math.floor(Math.random() * 1000000)}`,
+            orderUpdateRandomKey: `${Math.random()}`
         }
     },
     computed: {
@@ -64,6 +65,9 @@ export default {
                 width: `${this.reorderBox.width}px`,
                 height: `${this.reorderBox.height}px`,
             };
+        },
+        sizeCacheBreakerAdded() {
+            return `${this.sizeCacheBreaker}-${this.orderUpdateRandomKey}`
         }
     },
     methods: {
@@ -107,7 +111,6 @@ export default {
         },
 
         reorderUpdate(event) {
-            this.reorderBox.x += event.movementX;
             this.reorderBox.y += event.movementY;
 
             this.updateActiveDropoffPoint();
@@ -186,6 +189,10 @@ export default {
                 currentIndex: parseInt(this.reorderingAttribute.$el.dataset.order, 10),
                 targetIndex: closest.index,
             });
+
+            setTimeout(() => {
+                this.orderUpdateRandomKey = `${Math.random()}`;
+            }, 10);
         }
     }
 }

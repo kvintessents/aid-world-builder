@@ -18,7 +18,7 @@
                 :value="attribute.value"
                 :sizeCacheBreaker="sizeCacheBreaker"
             />
-            <div class="reorder-handle" @mousedown="startReorder"></div>
+            <div class="reorder-handle" @mousedown="startReorder"><span class="reorder-handle-innard">↕</span></div>
         </td>
     </tr>
 </template>
@@ -138,12 +138,32 @@ export default {
     }
 
     .reorder-handle {
+        display: none;
         position: absolute;
         right: 0;
         top: 0;
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.03);
         height: 100%;
-        width: 1em;
+        width: 2em;
         cursor: grab;
+        opacity: 0.5;
+    }
+
+    .attribute:hover .reorder-handle {
+        display: table;
+    }
+
+    .reorder-handle-innard {
+        display: table-cell;
+        text-align: center;
+        font-size: 1.5em;
+        vertical-align: middle;
+        color: #222;
+        position: relative;
+        top: 2px;
+    }
+
+    .reorder-handle:hover {
+        opacity: 1;
     }
 </style>
