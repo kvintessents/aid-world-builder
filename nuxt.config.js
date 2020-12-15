@@ -21,6 +21,7 @@ export default {
     },
 
     head: {
+        title: 'AID World Builder',
         link: [
 
         ],
