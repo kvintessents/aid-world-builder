@@ -3,16 +3,15 @@
         <td class="column-key">
             <ValueTextarea
                 class="input key"
-                :property-index="index"
                 @input="handleKeyChange"
                 @keydown="onValueKeyDown"
                 :value="attribute.key"
                 :sizeCacheBreaker="sizeCacheBreaker" />
+            <button class="delete-button" @click="removeProperty">ⓧ</button>
         </td>
         <td class="column-value">
             <ValueTextarea
                 class="input value"
-                :property-index="index"
                 @input="handleValueChange"
                 @keydown="onKeyKeyDown"
                 :value="attribute.value"
@@ -45,18 +44,27 @@ export default {
             default: '',
         }
     },
+    computed: {
+        isEmpty() {
+            const index = parseInt(this.index, 10);
+            return (
+                this.node.properties[index].value.trim() === '' &&
+                this.node.properties[index].key.trim() === ''
+            )
+        },
+    },
     methods: {
         handleKeyChange(event) {
             this.$store.dispatch('world/setProperty', {
                 node: this.node,
-                index: event.target.getAttribute('property-index'),
+                index: this.index,
                 key: event.target.value
             });
         },
         handleValueChange(event) {
             this.$store.dispatch('world/setProperty', {
                 node: this.node,
-                index: event.target.getAttribute('property-index'),
+                index: this.index,
                 value: event.target.value
             });
         },
@@ -65,7 +73,7 @@ export default {
                 return true;
             }
 
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
+            const index = parseInt(this.index, 10);
             const lastIndex = this.node.properties.length - 1;
 
             if (index === lastIndex) {
@@ -79,15 +87,10 @@ export default {
                 return true;
             }
 
-            const index = parseInt(event.target.getAttribute('property-index'), 10);
-
-            if (
-                this.node.properties[index].value.trim() === '' &&
-                this.node.properties[index].key.trim() === ''
-            ) {
+            if (this.isEmpty) {
                 this.$store.dispatch('world/removeProperty', {
                     node: this.node,
-                    propertyIndex: index
+                    propertyIndex: this.index
                 });
             }
 
@@ -97,6 +100,20 @@ export default {
             event.preventDefault();
             event.stopPropagation();
             this.$emit('startReorder', { event, component: this });
+        },
+        removeProperty(event) {
+            console.log('event');
+            if (!this.isEmpty) {
+                const confirmed = window.confirm('Are you sure you want to delete this trait?');
+                if (!confirmed) {
+                    return;
+                }
+            }
+
+            this.$store.dispatch('world/removeProperty', {
+                node: this.node,
+                propertyIndex: this.index
+            });
         }
     }
 }
@@ -108,6 +125,7 @@ export default {
     }
 
     .column-key {
+        position: relative;
         padding: 0.25em 0.5em;
         padding-right: 0;
         width: 20%;
@@ -165,5 +183,22 @@ export default {
 
     .reorder-handle:hover {
         opacity: 1;
+    }
+
+    .attribute:hover .delete-button {
+        color: red;
+    }
+
+    .delete-button {
+        position: absolute;
+        right: 100%;
+        top: 0;
+        background: white;
+        color: white;
+        border: none;
+        width: 1.5em;
+        height: 100%;
+        cursor: pointer;
+        padding: 0;
     }
 </style>

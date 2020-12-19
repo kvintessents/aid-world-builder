@@ -39,7 +39,7 @@ function debounceFunction(fn, ms) {
     }
 }
 
-const synchronize = debounceFunction(syncronizeState, 1000);
+const synchronize = debounceFunction(syncronizeState, 1500);
 
 export const state = () => ({
     id: null,

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="node-contents">
         <header class="header" :class="{ selected: node.selected }">
             <input class="input name" @input="handleNameChange" :value="node.name" @mousedown="stopPropagation" />
         </header>
@@ -15,7 +15,7 @@
 
                 <NodeAttributes v-if="node.properties.length" :node="node" />
 
-                <div v-else class="add-first-trait">
+                <div class="add-trait">
                     <Button tiny create @click="appendFirstProperty">+ Add trait</Button>
                 </div>
             </div>
@@ -89,6 +89,10 @@ export default {
 <style lang="scss" scoped>
     $radius: 5px;
 
+    .node-contents {
+        height: 100%;
+    }
+
     .input {
         width: 100%;
         box-sizing: border-box;
@@ -132,7 +136,20 @@ export default {
         margin: 1em 0;
     }
 
-    .add-first-trait {
+    .node-contents:hover .add-trait {
+        display: block;
+    }
+
+    .add-trait {
+        display: none;
+        position: absolute;
+        bottom: -0.75em;
+        width: 100%;
+        margin-left: -1.4em;
         text-align: center;
+    }
+
+    .add-trait > button {
+        cursor: pointer;
     }
 </style>
