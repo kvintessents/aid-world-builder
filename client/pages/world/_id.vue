@@ -1,6 +1,6 @@
 <template>
     <div>
-        <EditWorld />
+        <EditWorld v-if="$store.state.world" />
     </div>
 </template>
 
@@ -10,11 +10,9 @@
     export default {
         layout: 'default',
         components: { EditWorld },
-        async asyncData({ store, route }) {
+        async asyncData({ store, route, error }) {
             await store.dispatch('world/fetchWorld', route.params.id);
             return {};
         },
-        computed: {},
-        methods: {}
     }
 </script>

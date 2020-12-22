@@ -4,28 +4,20 @@
             <form @submit.prevent="onSubmit" :disabled="creating">
                 <FormRow>
                     <Input label="New World Name" v-model="worldName" />
-                    <Button type="submit">Create</Button>
+                    <Button type="submit" :disabled="!worldName.trim()">Create</Button>
                 </FormRow>
             </form>
         </Paper>
 
         <Paper v-if="$auth.user" padded-2 class="world-list-paper" >
             <h2>Your worlds</h2>
-            <ol v-if="worlds.length" class="world-list">
-                <li class="world-list-element" v-for="world in worlds" :key="world.id">
-                    <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
-                </li>
-            </ol>
+            <WorldList v-if="worlds.length" :worlds="worlds" />
             <p v-else>Your worlds will appear here.</p>
         </Paper>
 
         <Paper v-if="publicWorlds.length" padded-2 class="world-list-paper" >
             <h2>Publicly viewable worlds</h2>
-            <ol class="world-list">
-                <li class="world-list-element" v-for="world in publicWorlds" :key="world.id">
-                    <nuxt-link :to="`world/${world.id}`">{{ world.name }}</nuxt-link>
-                </li>
-            </ol>
+            <WorldList :worlds="publicWorlds" />
         </Paper>
     </div>
 </template>
@@ -35,6 +27,7 @@
     import FormRow from '~/components/core/atoms/FormRow';
     import Input from '~/components/core/atoms/Input';
     import Button from '~/components/core/atoms/Button';
+    import WorldList from '~/components/WorldList';
 
     async function fetchWorlds($axios, $auth) {
         if (!$auth.user) {
@@ -66,7 +59,7 @@
 
     export default {
         layout: 'default',
-        components: { Input, Button, FormRow, Paper },
+        components: { Input, Button, FormRow, Paper, WorldList },
         data() {
             return {
                 creating: false,
@@ -109,15 +102,5 @@
 
     .world-list-paper, .create-world {
         margin-top: 2em;
-    }
-
-    .world-list {
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
-    }
-
-    .world-list-element {
-        margin-bottom: 0.5em;
     }
 </style>

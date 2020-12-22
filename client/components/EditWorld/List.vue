@@ -77,8 +77,9 @@ export default {
             let lastRightPoint = null;
             // Margin between the nodes in pixels
             const halfMargin = 7;
+            const components = this.$refs.nodeRefs || [];
 
-            for (const component of this.$refs.nodeRefs) {
+            for (const component of components) {
                 const bBox = component.$el.getBoundingClientRect();
                 const order = parseInt(component.$el.dataset.order, 10);
 

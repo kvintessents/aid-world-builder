@@ -49,7 +49,7 @@ router.get('/worlds/', userAuth, asyncRoute(async function (req, res) {
 
     const result = await query(sql`
         SELECT
-            id, name, is_public, user_id, version, created_at
+            id, name, is_public, user_id, version, created_at, LENGTH(document) as document_length
         FROM worlds
         WHERE user_id = ${userId}
         ORDER BY created_at DESC
@@ -61,7 +61,7 @@ router.get('/worlds/', userAuth, asyncRoute(async function (req, res) {
 router.get('/public-worlds/', asyncRoute(async function (req, res) {
     const result = await query(sql`
         SELECT
-            id, name, is_public, user_id, version, created_at
+            id, name, is_public, user_id, version, created_at, LENGTH(document) as document_length
         FROM worlds
         WHERE is_public = 1
         ORDER BY created_at DESC
@@ -72,10 +72,19 @@ router.get('/public-worlds/', asyncRoute(async function (req, res) {
 
 router.get('/worlds/:id', userAuth, asyncRoute(async function (req, res) {
     const userId = res.locals.user && res.locals.user.id ? parseInt(res.locals.user.id) : null;
+    const isAdmin = Boolean(res.locals.user && res.locals.user.is_admin);
 
-    const result = await query(sql`
-        SELECT * FROM worlds WHERE id = ${req.params.id} AND (user_id = ${userId} OR is_public = 1)
-    `);
+    let result;
+
+    if (isAdmin) {
+        result = await query(sql`
+            SELECT * FROM worlds WHERE id = ${req.params.id}
+        `);
+    } else {
+        result = await query(sql`
+            SELECT * FROM worlds WHERE id = ${req.params.id} AND (user_id = ${userId} OR is_public = 1)
+        `);
+    }
 
     if (!result || !result[0]) {
         return res.status(404).json({ success: false });

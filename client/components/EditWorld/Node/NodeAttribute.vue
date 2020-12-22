@@ -102,7 +102,6 @@ export default {
             this.$emit('startReorder', { event, component: this });
         },
         removeProperty(event) {
-            console.log('event');
             if (!this.isEmpty) {
                 const confirmed = window.confirm('Are you sure you want to delete this trait?');
                 if (!confirmed) {
