@@ -14,17 +14,12 @@ app.use(rateLimiter());
 app.use(bodyParser.json());
 
 // Import API Routes
-app.use(require('./routes/health'));
 app.use(require('./routes/auth'));
-app.use(require('./routes/users'));
-app.use(require('./routes/posts'));
-app.use(require('./routes/upvotes'));
-app.use(require('./routes/comments'));
-app.use(require('./routes/test'));
-app.use(require('./routes/worlds'));
+app.use(require('./routes/health'));
 app.use(require('./routes/feedback'));
-
-app.use(require('./routes/thumbnails'));
+app.use(require('./routes/migrate/migrate'));
+app.use(require('./routes/users'));
+app.use(require('./routes/worlds'));
 
 app.use(errors());
 app.use(require('./middlewares/errorHandler.middleware'));
