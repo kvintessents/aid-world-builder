@@ -29,6 +29,7 @@
     import Button from '~/components/core/atoms/Button';
     import WorldList from '~/components/WorldList';
 
+    // This should be in vuex as an action
     async function fetchWorlds($axios, $auth) {
         if (!$auth.user) {
             return [];
@@ -47,6 +48,7 @@
         return response.data.data;
     }
 
+    // This should be in vuex as an action
     async function fetchPublicWorlds($axios) {
         let response;
 
