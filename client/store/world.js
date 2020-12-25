@@ -7,7 +7,12 @@ async function syncronizeState($axios, state) {
     delete document.syncingCalls;
     delete document.isOwner;
 
-    const body = { document: JSON.stringify(document), version: Date.now(), isPublic: document.isPublic };
+    const body = {
+        document: JSON.stringify(document),
+        version: Date.now(),
+        isPublic: document.isPublic,
+        name: document.name
+    };
 
     return await $axios.post(`/world/${state.id}`, body);
 }
@@ -39,7 +44,7 @@ function debounceFunction(fn, ms) {
     }
 }
 
-const synchronize = debounceFunction(syncronizeState, 1500);
+const synchronize = debounceFunction(syncronizeState, 2000);
 
 export const state = () => ({
     id: null,
@@ -49,6 +54,7 @@ export const state = () => ({
     isOwner: false,
     isNodeView: false,
     isPublic: false,
+    name: 'Untitled',
 });
 
 export const mutations = {
@@ -68,7 +74,9 @@ export const mutations = {
         });
         Object.assign(state, document);
         state.id = world.id;
-        state.isOwner = !!(currentUserId && world.user_id && (parseInt(world.user_id) === parseInt(currentUserId)));
+        state.name = world.name;
+        state.isOwner = Boolean(currentUserId && world.user_id && (parseInt(world.user_id) === parseInt(currentUserId)));
+        state.isPublic = Boolean(world.is_public);
     },
     addNode(state, position) {
         state.lastId += 1;
@@ -258,6 +266,9 @@ export const mutations = {
 
             node.properties = Vue.observable([ ...left, currentAttribute, ...right ]);
         }
+    },
+    nameChange(state, name) {
+        state.name = name;
     }
 };
 
@@ -330,6 +341,10 @@ export const actions = {
     },
     async reorderNodeAttribute({ commit, dispatch }, args) {
         commit('reorderNodeAttribute', args);
+        dispatch('sync');
+    },
+    async nameChange({ commit, dispatch }, args) {
+        commit('nameChange', args);
         dispatch('sync');
     },
 }

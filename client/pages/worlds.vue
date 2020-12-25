@@ -3,8 +3,8 @@
         <Paper v-if="$auth.user" padded-2 class="create-world">
             <form @submit.prevent="onSubmit" :disabled="creating">
                 <FormRow>
-                    <Input label="New World Name" v-model="worldName" />
-                    <Button type="submit" :disabled="!worldName.trim()">Create</Button>
+                    <Input label="New World Name" :value="worldName" @input="onWorldName" />
+                    <Button type="submit" :disabled="!worldName.trim() || creating">Create</Button>
                 </FormRow>
             </form>
         </Paper>
@@ -77,6 +77,9 @@
             return { worlds, publicWorlds };
         },
         methods: {
+            onWorldName(value) {
+                this.worldName = value;
+            },
             async onSubmit() {
                 this.creating = true;
                 let response;
@@ -90,6 +93,8 @@
                     this.worlds = await fetchWorlds(this.$axios, this.$auth);
                     this.publicWorlds = await fetchPublicWorlds(this.$axios);
                 } catch (e) { console.error(e); }
+
+                this.worldName = '';
 
                 this.creating = false;
             },

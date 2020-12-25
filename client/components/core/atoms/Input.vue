@@ -7,6 +7,8 @@
         <input
             class="input"
             v-model="localValue"
+            :value="value"
+
             :type="type"
             :class="{
                 disabled: disabled,
@@ -23,7 +25,8 @@ export default {
         disabled: { type: Boolean, required: false },
         loading: { type: Boolean, default: false },
         type: { type: String, default: 'text' },
-        label: { type: String, default: null }
+        label: { type: String, default: null },
+        value: { type: String, default: null },
     },
     computed: {
         localValue: {

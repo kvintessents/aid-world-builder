@@ -1,9 +1,11 @@
 <template>
     <table class="world-list">
         <thead>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Added</th>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Added</th>
+            </tr>
         </thead>
         <tbody>
             <tr v-for="world in worlds" :key="world.id">

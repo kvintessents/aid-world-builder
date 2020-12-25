@@ -10,17 +10,22 @@ const { escape } = require('sqlstring');
 
 const query = promisify(db.query).bind(db);
 
-async function saveWorld({ id, version, document, userId, isPublic }) {
+async function saveWorld({ id, version, document, userId, isPublic, name }) {
     let publicTerm = '';
+    let nameTerm = '';
 
     if (typeof isPublic === 'boolean') {
         publicTerm = `, is_public = ${isPublic ? 1 : 0}`
     }
 
+    if (typeof name === 'string' && name.trim().length) {
+        nameTerm = `, name = ${escape(name)}`
+    }
+
     const command = `
         UPDATE worlds
         SET
-            document = ${escape(document)} ${publicTerm}
+            document = ${escape(document)} ${publicTerm} ${nameTerm}
         WHERE id = ${escape(id)} AND user_id = ${parseInt(userId)};
     `;
 
@@ -122,19 +127,21 @@ router.post('/world/:id', userAuth, celebrate({
         document: Joi.string().required(),
         isPublic: Joi.boolean().default(null),
         version: Joi.number().required(),
+        name: Joi.string().default(null),
     }),
 }), asyncRoute(async function (req, res) {
     if (!res.locals.user || !res.locals.user.id) {
         return res.status(403).json({ success: false })
     }
 
-    const { version, document, isPublic } = req.body;
+    const { version, document, isPublic, name } = req.body;
 
     const result = await saveWorld({
         id: req.params.id,
         userId: res.locals.user.id,
         version,
         isPublic,
+        name,
         document
     });
 

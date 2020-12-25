@@ -2,9 +2,10 @@
     <nav class="header">
         <div class="logo-container">
             <nuxt-link to="/" class="logo-link">
-                <h1 v-if="isFrontpage" class="logo">AID World Builder</h1>
-                <div v-else class="logo">AID World Builder</div>
+                <h1 v-if="isFrontpage" class="logo">AID WB</h1>
+                <div v-else class="logo">{{ isEditPage ? 'AID WB' : 'AID WB' }}</div>
             </nuxt-link>
+            <input v-if="isEditPage" class="logo world-input" :value="worldName" :size="worldName.length" @input="onWorldNameInput" />
         </div>
         
 
@@ -28,6 +29,19 @@
             isFrontpage: {
                 type: Boolean,
                 default: false,
+            }
+        },
+        computed: {
+            worldName() {
+                return this.$store.state.world.name;
+            },
+            isEditPage() {
+                return this.$route.name === 'world-id';
+            }
+        },
+        methods: {
+            onWorldNameInput(event) {
+                this.$store.dispatch('world/nameChange', event.target.value);
             }
         }
     }
@@ -54,9 +68,15 @@
         font-variant: small-caps;
         font-weight: 400;
 
-        height: 20px;
         position: relative;
         top: -3px;
+        display: inline-block;
+    }
+
+    .world-input {
+        border: none;
+        font-size: 1.5em;
+        margin-left: 1em;
     }
 
     .search {
