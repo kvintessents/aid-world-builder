@@ -29,8 +29,8 @@
         data() {
             return {
                 user: {
-                    email: 'kvintessents@gmail.com',
-                    password: 'asdasdasd',
+                    email: '',
+                    password: '',
                 }
             }
         }
