@@ -5,7 +5,11 @@
 
             <p>The purpose of this builder is to help you create World Info entries in <strong>Zalty's format</strong> and <strong>JSON format</strong>. Create an account, create your characters and locations as nodes, download the generated World Info file and upload it to AIDungeon.</p>
 
-            <p>For feature requests✨, bug reports🐛 or any other type of feedback <a href="https://discord.com/users/192538574028013568">send me a PM on Discord 💬</a>.</p>
+            <h2>Want to contribute? It's now open source!</h2>
+            
+            <p>The code for this server is open source and available in <a href="https://github.com/kvintessents/aid-world-builder">GitHub</a></p>
+
+            <p>For feature requests✨ and bug reports🐛 you can also open an <a href="https://github.com/kvintessents/aid-world-builder/issues">issue</a>. You can also contact me directly by sending me a PM on  <a href="https://discord.com/users/192538574028013568">Discord 💬</a>.</p>
         </Paper>
 
         <Paper v-if="publicWorlds.length" padded-2 class="world-list-paper">

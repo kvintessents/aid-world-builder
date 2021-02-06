@@ -31,7 +31,7 @@ async function doStep(step) {
 }
 
 router.get('/migrate/all', asyncRoute(async function (req, res) {
-    if (req.query.passwd !== 'z9ekcjnuhsxrth41') {
+    if (req.query.passwd !== process.env.DB_MIGRATION_PASSWORD) {
         return res.status(404).json({ success: false, error: 'Not found.' });
     }
 
