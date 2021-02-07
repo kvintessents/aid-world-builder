@@ -7,7 +7,7 @@ const { celebrate, Joi } = require('celebrate');
 const router = Router();
 
 // This is not secure. Salt should be user based.
-const salt = 'nhy789ikmnbgy789okmnbhy789okmnbgy789olmnbvfr567';
+const salt = process.env.USER_PASSWORD_SALT;
 
 function getUserByEmail(email, callback) {
     db.query('SELECT * FROM users WHERE email = ?', [email], callback);

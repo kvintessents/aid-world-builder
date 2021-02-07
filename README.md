@@ -30,6 +30,8 @@ DB_DATABASE=aid-world-builder
 DB_USER=root
 DB_PASS=password
 DB_MIGRATION_PASSWORD=password
+
+USER_PASSWORD_SALT=salt
 ```
 
 5. Run `npm run dev` to start the server
