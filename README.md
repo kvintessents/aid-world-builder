@@ -2,6 +2,12 @@
 An online world builder for AI Dungeon.
 
 https://aid-world-builder.ey.r.appspot.com/
+
+## Contributing
+
+Please feel free to clone the code and make pull requests. The code will be reviewed to make sure it matches the required standards and that it is beneficial users and that it fits the webapp.
+
+After a successful merge to the `main` branch a new version will be deployed to the main server.
 ## Development
 
 ### Get started
@@ -30,11 +36,6 @@ DB_MIGRATION_PASSWORD=password
 6. Navigate to `http://localhost:3000/api/migrate/all?passwd=password`
 
 You can now navigate to `http://localhost:3000/` and you should have a working server instance.
-### Contributing
-
-Please feel free to clone the code and make pull requests. The code will be reviewed to make sure it matches the required standards and that it is beneficial users and that it fits the webapp.
-
-After a successful merge to the `main` branch a new version will be deployed to the main server.
 
 ### Overview
 
@@ -52,6 +53,9 @@ The `/api` folder has the server-side logic that the user cannot access, impleme
 
 When the user makes a request to `https://aid-world-builder.ey.r.appspot.com/api/*` then some file in this folder is probably dealing with that. You can take a look at `/api/index.js` for an overview of the API routes.
 
+### Export formats
+
+The export formats are in [/client/utils/formatters/](https://github.com/kvintessents/aid-world-builder/tree/main/client/utils/formatters). Check out the README.md in that folder for an explanation on how to build your own formatter.
 
 ## Troubleshooting
 
