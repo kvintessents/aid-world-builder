@@ -20,6 +20,10 @@ export default {
         port: port, // default: 3000
     },
 
+    plugins: [
+        { src: '~/plugins/ssr-cookie-proxy.js', mode: 'server' },
+    ],
+
     head: {
         title: 'AID World Builder',
         link: [
@@ -62,6 +66,6 @@ export default {
     },
 
     serverMiddleware: {
-        '/api': '~/../api',
+        '/api': '../api',
     },
 };
