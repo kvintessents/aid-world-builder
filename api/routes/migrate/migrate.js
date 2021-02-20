@@ -10,6 +10,8 @@ async function doStep(step) {
     try {
         await step.action({ sql, query });
     } catch (error) {
+        console.log(error);
+
         return {
             success: false,
             message: 'Error when doing migration step.',
@@ -35,6 +37,7 @@ router.get('/migrate/all', asyncRoute(async function (req, res) {
         return res.status(404).json({ success: false, error: 'Not found.' });
     }
 
+    // Ensures the migration table itself, which is used to mark the pointer of the migration
     try {
         await migrationModel.ensure();
     } catch (e) {

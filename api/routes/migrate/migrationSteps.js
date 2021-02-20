@@ -4,9 +4,8 @@ const { promisify } = require('util');
 
 const readdir = promisify(fs.readdir).bind(fs);
 
-const dir = path.join(__dirname, './steps');
-
 module.exports = async function migrationSteps() {
+    const dir = path.join(__dirname, './steps');
     const files = await readdir(dir);
 
     return files.map(fileName => ({

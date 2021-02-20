@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { Router } = require('express');
 const db = require('../utils/database');
+const getPasswordHash = require('../utils/getPasswordHash');
 const userAuthMiddleware = require('../middlewares/userAuth.middleware');
 const { celebrate, Joi } = require('celebrate');
 
@@ -11,11 +12,6 @@ const salt = process.env.USER_PASSWORD_SALT;
 
 function getUserByEmail(email, callback) {
     db.query('SELECT * FROM users WHERE email = ?', [email], callback);
-}
-
-// Should be async because it takes a lot of cpu
-function getHash(password, salt) {
-    return crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
 }
 
 function userNotFound(res) {
@@ -50,7 +46,7 @@ router.post('/auth/register', celebrate({
                 VALUES
                     (?, ?, ?);
             `,
-            [req.body.email, getHash(req.body.password, salt), token],
+            [req.body.email, getPasswordHash(req.body.password, salt), token],
             (err, results) => {
                 if (err) throw err;
 
@@ -75,7 +71,7 @@ router.post('/auth/login', function (req, res) {
 
         const user = results[0];
 
-        if (user.password !== getHash(req.body.password, salt)) {
+        if (user.password !== getPasswordHash(req.body.password, salt)) {
             return userNotFound(res);
         }
 
