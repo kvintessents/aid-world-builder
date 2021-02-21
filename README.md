@@ -34,8 +34,7 @@ DB_MIGRATION_PASSWORD=password
 USER_PASSWORD_SALT=salt
 ```
 
-5. Generate a jwt public key, eg: `ssh-keygen -t rsa -b 2048 -m PEM -f jwtRS256.key` (leave passphrase empty)
-6. Put the generated key in the `api/config/` directory (create one if it doesn't exist)
+5. From your root, run: `mkdir ./api/config/; ssh-keygen -t rsa -b 2048 -m PEM -f ./api/config/jwtRS256.key` to generate a key for the JWT (leave passphrase empty)
 7. Run `npm run dev` to start the server. You will most likely get a `"Client does not support authentication protocol ..."` error. Refer to the Troubleshooting part in this README in the bottom on how to fix that.
 8. Navigate to `http://localhost:3000/api/migrate/all?passwd=password` which will ensure and seed all the tables for the app
 
