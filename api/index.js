@@ -2,16 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const { errors } = require('celebrate');
 const rateLimiter = require('./middlewares/rateLimiter.middleware');
-
-// Require API routes
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 
 // Create express instance
 const app = express();
 
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('tiny'));
+}
+
 app.use(rateLimiter());
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Import API Routes
 app.use(require('./routes/auth'));

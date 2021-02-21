@@ -14,14 +14,14 @@ After a successful merge to the `main` branch a new version will be deployed to 
 
 #### Prerequisites
 
-1. Docker
-2. Node
+1. Docker (https://www.docker.com/)
+2. Node.JS
 
 #### Installation
 
 1. Clone the repository
 2. Run `npm install` to install the required package dependencies
-3. Run `npm run db` to start the MySQL server in Docker
+3. Run `npm run db` to start the MySQL server in Docker (https://www.docker.com/)
 4. Create an `.env` file in the root of the project with the following contents:
 
 ```
@@ -34,8 +34,9 @@ DB_MIGRATION_PASSWORD=password
 USER_PASSWORD_SALT=salt
 ```
 
-5. Run `npm run dev` to start the server
-6. Navigate to `http://localhost:3000/api/migrate/all?passwd=password`
+5. From your root, run: `mkdir ./api/config/; ssh-keygen -t rsa -b 2048 -m PEM -f ./api/config/jwtRS256.key` to generate a key for the JWT (leave passphrase empty)
+7. Run `npm run dev` to start the server. You will most likely get a `"Client does not support authentication protocol ..."` error. Refer to the Troubleshooting part in this README in the bottom on how to fix that.
+8. Navigate to `http://localhost:3000/api/migrate/all?passwd=password` which will ensure and seed all the tables for the app
 
 You can now navigate to `http://localhost:3000/` and you should have a working server instance.
 
@@ -63,6 +64,8 @@ The export formats are in [/client/utils/formatters/](https://github.com/kvintes
 
 ##### Client does not support authentication protocol requested by server; consider upgrading MySQL client
 
+Close the Nuxt server.
+
 Get into the DB Docker instance:
 ```
 docker exec -it aid-world-builder-mysql /bin/bash
@@ -73,8 +76,8 @@ Get into the MySQL server:
 
 Run the following commands
 ```
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'
-ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'password'
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+ALTER USER 'root' IDENTIFIED WITH mysql_native_password BY 'password';
 flush privileges;
 ```
 

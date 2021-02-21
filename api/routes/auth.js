@@ -3,6 +3,7 @@ const { Router } = require('express');
 const db = require('../utils/database');
 const userAuthMiddleware = require('../middlewares/userAuth.middleware');
 const { celebrate, Joi } = require('celebrate');
+const jwt = require('../utils/jwt');
 
 const router = Router();
 
@@ -107,6 +108,7 @@ router.post('/auth/login', function (req, res) {
 
 // Authorization should be middleware or simple callable function
 router.post('/auth/logout', userAuthMiddleware, function (req, res) {
+    jwt.clearCookie(res);
     res.json({ success: true, data: null });
 });
 

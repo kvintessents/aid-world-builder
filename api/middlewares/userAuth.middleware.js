@@ -1,4 +1,9 @@
 const db = require('../utils/database');
+const jwt = require('../utils/jwt');
+const asyncMiddleware = require('../utils/asyncMiddleware');
+const { promisify } = require('util');
+
+const query = promisify(db.query).bind(db);
 
 function respondUnauthorized(res) {
     return res.status(401).json({
@@ -29,26 +34,32 @@ function getTokenFromHeader(req) {
     return parts[1];
 }
 
-function getUserByToken(token, callback) {
-    db.query('SELECT * FROM users WHERE token = ?', [token], callback);
+function getUserByToken(token) {
+    return query('SELECT * FROM users WHERE token = ?', [token]);
 }
 
-module.exports = (req, res, next) => {
+module.exports = asyncMiddleware(async (req, res) => {
+    const jwtPayload = await jwt.getUser(req);
+
+    if (jwtPayload) {
+        res.locals.user = jwtPayload;
+        return;
+    }
+
     const token = getTokenFromHeader(req);
 
     if (!token) {
-        return next();
+        return;
     }
 
-    getUserByToken(token, (err, results) => {
-        if (err) throw err;
+    const results = await getUserByToken(token);
 
-        if (!results.length) {
-            return respondUnauthorized(res);
-        }
+    if (!results.length) {
+        return respondUnauthorized(res);
+    }
 
-        res.locals.user = results[0];
+    // Create JWT
+    const newPayload = await jwt.setUser(res, results[0]);
 
-        next();
-    });
-};
+    res.locals.user = newPayload;
+});
