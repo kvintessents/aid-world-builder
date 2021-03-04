@@ -1,6 +1,10 @@
 <template>
     <div>
         <Paper padded-2 class="website-description">
+            <p class="patreon-text">
+                <a href="https://www.patreon.com/aidwb" target="_blank" class="patreon-link">Support AID World Builder on Pateron ↗</a>
+            </p>
+
             <h2>AID World Builder (alpha)</h2>
 
             <p>The purpose of this builder is to help you create World Info entries in <strong>Zalty's format</strong> and <strong>JSON format</strong>. Create an account, create your characters and locations as nodes, download the generated World Info file and upload it to AIDungeon.</p>
@@ -63,5 +67,10 @@
         margin: 0 auto;
         margin-top: 2em;
         width: 50em;
+    }
+
+    .patreon-text {
+        text-align: center;
+        margin-bottom: 2em;
     }
 </style>

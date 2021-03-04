@@ -3,8 +3,9 @@
         <div class="logo-container">
             <nuxt-link to="/" class="logo-link">
                 <h1 v-if="isFrontpage" class="logo">AID WB</h1>
-                <div v-else class="logo">{{ isEditPage ? 'AID WB' : 'AID WB' }}</div>
+                <div v-else class="logo">AID WB</div>
             </nuxt-link>
+            <a href="https://www.patreon.com/aidwb" target="_blank" class="patreon-link">Patreon</a>
             <input v-if="isEditPage" class="logo world-input" :value="worldName" :size="worldName.length" @input="onWorldNameInput" />
         </div>
         
@@ -81,5 +82,11 @@
 
     .search {
         flex-grow: 1;
+    }
+
+    .patreon-link {
+        position: relative;
+        top: -0.5em;
+        left: 0.5em;
     }
 </style>
