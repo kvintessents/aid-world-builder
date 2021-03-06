@@ -1,205 +1,224 @@
 <template>
     <div
+        ref="node"
         class="Node"
         :class="{ selected: node.selected, positioned: positioned, minimized: node.minimized, reordering: reordering }"
         :style="style"
-        ref="node"
         @mousedown="onMouseDown"
     >
         <NodePreview v-if="previewing" :node="node" :type="previewType" />
         <NodeContents v-else :node="node" />
 
         <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
-            <div class="resize" @mousedown="resizeStart" v-if="positioned"></div>
-            <div class="delete" @click="deleteNode" title="Delete">ⓧ</div>
-            <div class="minimize" @click="minimizeNode" title="Minimize">⊝</div>
-            <div class="preview" @click="togglePreview" title="Preview in JSON format">P</div>
-            <div class="preview-zaltys" @click="togglePreviewZaltys" title="Preview in Zaltys format (recommended)">Z</div>
-            <div class="duplicate-node" @click="duplicateNode" title="Duplicate"></div>
+            <div v-if="positioned" class="resize" @mousedown="resizeStart" />
+            <div class="minimize" title="Minimize" @click="minimizeNode">
+                ⊝
+            </div>
+        </div>
+
+        <div class="menu" @mousedown="stopPropagation" @click="stopPropagation">
+            <div class="menu-button">
+                ☰
+            </div>
+            <ul class="menu-contents">
+                <li @click="togglePreviewZaltys">
+                    Preview (Zalty's)
+                </li>
+                <li @click="togglePreview">
+                    Preview (JSON)
+                </li>
+                <li @click="duplicateNode">
+                    Duplicate
+                </li>
+                <li @click="addLabel">
+                    Add label
+                </li>
+                <li @click="deleteNode">
+                    Delete
+                </li>
+            </ul>
         </div>
     </div>
 </template>
 
 <script>
-import NodeContents from '~/components/EditWorld/Node/NodeContents';
-import NodePreview from '~/components/EditWorld/Node/NodePreview';
-import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
-import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
+    import NodeContents from '~/components/EditWorld/Node/NodeContents';
+    import NodePreview from '~/components/EditWorld/Node/NodePreview';
 
-export default {
-    components: { NodeLabelControl, ValueTextarea, NodeContents, NodePreview },
-    props: {
-        node: {
-            type: Object,
-            required: true,
+    export default {
+        components: { NodeContents, NodePreview },
+        props: {
+            node: {
+                type: Object,
+                required: true,
+            },
+            positioned: {
+                type: Boolean,
+                required: true,
+            },
         },
-        positioned: {
-            type: Boolean,
-            required: true,
-        },
-    },
-    data() {
-        return {
-            dragging: false,
-            reordering: false,
-            dropoffPoints: null,
-            previewType: 'json',
-            previewing: false,
-            id: `node-${Math.floor(Math.random() * 1000000)}`
-        }
-    },
-    computed: {
-        style() {
-            if (!this.positioned) {
-                return {
-                    position: 'relative',
-                    'margin-bottom': '1em',
-                    'margin-right': '1em',
-                };
-            }
-
-            const style = {
-                position: 'absolute',
-                left: `${this.node.position.x}px`,
-                top: `${this.node.position.y}px`,
+        data() {
+            return {
+                dragging: false,
+                reordering: false,
+                dropoffPoints: null,
+                previewType: 'json',
+                previewing: false,
+                id: `node-${Math.floor(Math.random() * 1000000)}`,
             };
+        },
+        computed: {
+            style() {
+                if (!this.positioned) {
+                    return {
+                        position: 'relative',
+                        'margin-bottom': '1em',
+                        'margin-right': '1em',
+                    };
+                }
 
-            if (this.node.size) {
+                const style = {
+                    position: 'absolute',
+                    left: `${this.node.position.x}px`,
+                    top: `${this.node.position.y}px`,
+                };
+
+                if (this.node.size) {
+                    Object.assign(style, {
+                        width: `${this.node.size.width}px`,
+                    });
+                }
+
                 Object.assign(style, {
-                    width: `${this.node.size.width}px`,
-                }) 
-            }
-
-            Object.assign(style, {
-                zIndex: this.node.zIndex || 0,
-            });
-
-            return style;
-        }
-    },
-    methods: {
-        onMouseDown(event) {
-            event.stopPropagation();
-
-            if (this.positioned) {
-                this.dragStart(event);
-            } else {
-                this.$emit('reorderStart', {
-                    node: this.node,
-                    event: event,
-                    component: this,
+                    zIndex: this.node.zIndex || 0,
                 });
-            }
-        },
 
-        // NODE VIEW DRAGGING
-        dragStart(event) {
-            this.dragging = true;
-            window.addEventListener('mousemove', this.reposition);
-            window.addEventListener('mouseup', this.dragStop);
-            this.sendToTop();
+                return style;
+            },
         },
-        dragStop(event) {
-            this.dragging = false;
-            window.removeEventListener('mousemove', this.reposition);
-            window.removeEventListener('mouseup', this.dragStop);
-        },
-        reposition(event) {
-            if (!this.dragging) {
-                return;
-            }
+        methods: {
+            onMouseDown(event) {
+                event.stopPropagation();
 
-            this.$store.dispatch('world/moveNodeBy', {
-                node: this.node,
-                position: { x: event.movementX, y: event.movementY }
-            });
-        },
+                if (this.positioned) {
+                    this.dragStart(event);
+                } else {
+                    this.$emit('reorderStart', {
+                        node: this.node,
+                        event: event,
+                        component: this,
+                    });
+                }
+            },
 
-        // NODE VIEW RESIZING
-        resizeStart(event) {
-            event.stopPropagation();
-            this.resizing = true;
-            window.addEventListener('mousemove', this.resize);
-            window.addEventListener('mouseup', this.resizeStop);
-            this.sendToTop();
-        },
-        resizeStop(event) {
-            event.stopPropagation();
-            this.resizing = false;
-            window.removeEventListener('mousemove', this.resize);
-            window.removeEventListener('mouseup', this.resizeStop);
-            this.syncNodeHeight();
-        },
-        resize(force = false) {
-            if (!force && !this.resizing) {
-                return;
-            }
+            // NODE VIEW DRAGGING
+            dragStart() {
+                this.dragging = true;
+                window.addEventListener('mousemove', this.reposition);
+                window.addEventListener('mouseup', this.dragStop);
+                this.sendToTop();
+            },
+            dragStop() {
+                this.dragging = false;
+                window.removeEventListener('mousemove', this.reposition);
+                window.removeEventListener('mouseup', this.dragStop);
+            },
+            reposition(event) {
+                if (!this.dragging) {
+                    return;
+                }
 
-            let currentSize = this.node.size;
+                this.$store.dispatch('world/moveNodeBy', {
+                    node: this.node,
+                    position: { x: event.movementX, y: event.movementY },
+                });
+            },
 
-            if (!currentSize) {
+            // NODE VIEW RESIZING
+            resizeStart(event) {
+                event.stopPropagation();
+                this.resizing = true;
+                window.addEventListener('mousemove', this.resize);
+                window.addEventListener('mouseup', this.resizeStop);
+                this.sendToTop();
+            },
+            resizeStop(event) {
+                event.stopPropagation();
+                this.resizing = false;
+                window.removeEventListener('mousemove', this.resize);
+                window.removeEventListener('mouseup', this.resizeStop);
+                this.syncNodeHeight();
+            },
+            resize(force = false) {
+                if (!force && !this.resizing) {
+                    return;
+                }
+
+                let currentSize = this.node.size;
+
+                if (!currentSize) {
+                    const size = this.$refs.node.getBoundingClientRect();
+                    currentSize = {
+                        width: size.width,
+                        height: size.height,
+                    };
+                }
+
+                this.$store.dispatch('world/setNodeSize', {
+                    node: this.node,
+                    size: {
+                        width: currentSize.width + event.movementX,
+                        height: currentSize.height,
+                    },
+                });
+            },
+            syncNodeHeight() {
                 const size = this.$refs.node.getBoundingClientRect();
-                currentSize = {
-                    width: size.width,
-                    height: size.height,
+
+                this.$store.dispatch('world/setNodeSize', {
+                    node: this.node,
+                    size: {
+                        width: size.width,
+                        height: size.height,
+                    },
+                });
+            },
+            sendToTop() {
+                this.$store.dispatch('world/sendToTop', this.node);
+            },
+            stopPropagation(event) {
+                event.stopPropagation();
+            },
+            deleteNode(event) {
+                event.stopPropagation();
+
+                if (window.confirm('Are you sure you wish to delete the entry? This cannot be undone.')) {
+                    this.$store.dispatch('world/deleteNode', this.node);
                 }
-            }
+            },
+            minimizeNode(event) {
+                event.stopPropagation();
+                this.$store.dispatch('world/minimizeNode', this.node);
 
-            this.$store.dispatch('world/setNodeSize', {
-                node: this.node,
-                size: {
-                    width: currentSize.width + event.movementX,
-                    height: currentSize.height,
+                if (this.positioned) {
+                    setTimeout(() => {
+                        this.syncNodeHeight();
+                    }, 100);
                 }
-            });
+            },
+            togglePreview() {
+                this.previewType = 'json';
+                this.previewing = !this.previewing;
+            },
+            togglePreviewZaltys() {
+                this.previewType = 'zaltys';
+                this.previewing = !this.previewing;
+            },
+            duplicateNode() {
+                this.$store.dispatch('world/duplicateNode', this.node);
+            },
         },
-        syncNodeHeight() {
-            const size = this.$refs.node.getBoundingClientRect();
-
-            this.$store.dispatch('world/setNodeSize', {
-                node: this.node,
-                size: {
-                    width: size.width,
-                    height: size.height,
-                }
-            });
-        },
-        sendToTop() {
-            this.$store.dispatch('world/sendToTop', this.node);
-        },
-        stopPropagation(event) {
-            event.stopPropagation();
-        },
-        deleteNode(event) {
-            event.stopPropagation();
-
-            if (window.confirm('Are you sure you wish to delete the entry? This cannot be undone.')) {
-                this.$store.dispatch('world/deleteNode', this.node);
-            }
-        },
-        minimizeNode(event) {
-            event.stopPropagation();
-            this.$store.dispatch('world/minimizeNode', this.node);
-
-            if (this.positioned) {
-                setTimeout(() => {
-                    this.syncNodeHeight();
-                }, 100);
-            }
-        },
-        togglePreview(event) {
-            this.previewType = 'json';
-            this.previewing = !this.previewing;
-        },
-        togglePreviewZaltys(event) {
-            this.previewType = 'zaltys';
-            this.previewing = !this.previewing;
-        },
-        duplicateNode(event) {
-            this.$store.dispatch('world/duplicateNode', this.node);
-        }
-    },
-}
+    };
 </script>
 <style lang="scss" scoped>
     $radius: 5px;
@@ -287,4 +306,22 @@ export default {
         background-size: 16px 16px;
     }
 
+    .menu {
+        position: absolute;
+        right: 10px;
+        top: 8px;
+        cursor: pointer;
+    }
+
+    .menu-button {
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-contents {
+        position: absolute;
+        right: 0;
+        top: 15px;
+        background: #fff;
+    }
 </style>

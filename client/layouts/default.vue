@@ -4,18 +4,16 @@
             <NavBar />
         </header>
 
-
         <nuxt class="content-wrapper" />
     </div>
 </template>
 
 <script>
     import NavBar from '~/components/NavBar/NavBar';
-    import Paper from '~/components/core/atoms/Paper';
 
     export default {
-        components: { NavBar, Paper },
-    }
+        components: { NavBar },
+    };
 </script>
 
 <style lang="scss">

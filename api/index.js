@@ -1,10 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const { errors } = require('celebrate');
-const rateLimiter = require('./middlewares/rateLimiter.middleware');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const rateLimiter = require('./middlewares/rateLimiter.middleware');
 
 // Create express instance
 const app = express();

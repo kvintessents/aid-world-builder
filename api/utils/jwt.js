@@ -16,7 +16,7 @@ module.exports = {
         return await signPromise(
             data,
             privateKey,
-            { algorithm, expiresIn }
+            { algorithm, expiresIn },
         );
     },
     async getUser(req) {
@@ -30,7 +30,7 @@ module.exports = {
             return await verifyPromise(
                 token,
                 privateKey,
-                { algorithms: [algorithm], maxAge: expiresIn }
+                { algorithms: [algorithm], maxAge: expiresIn },
             );
         } catch (e) {
             console.error('jwt.js', e.message);
@@ -38,6 +38,8 @@ module.exports = {
             return null;
         }
     },
+
+    // eslint-disable-next-line camelcase
     async setUser(res, { id, email, is_admin, active, display_name, token }) {
         const user = { id, email, is_admin, active, display_name, token };
         res.cookie(cookieName, await this.generate(user));
@@ -46,5 +48,5 @@ module.exports = {
     },
     clearCookie(res) {
         res.cookie(cookieName, 'false');
-    }
-}
+    },
+};

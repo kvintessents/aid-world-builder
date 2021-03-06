@@ -1,21 +1,25 @@
 <template>
     <div class="worlds">
         <Paper v-if="$auth.user" padded-2 class="create-world">
-            <form @submit.prevent="onSubmit" :disabled="creating">
+            <form :disabled="creating" @submit.prevent="onSubmit">
                 <FormRow>
                     <Input label="New World Name" :value="worldName" @input="onWorldName" />
-                    <Button type="submit" :disabled="!worldName.trim() || creating">Create</Button>
+                    <Button type="submit" :disabled="!worldName.trim() || creating">
+                        Create
+                    </Button>
                 </FormRow>
             </form>
         </Paper>
 
-        <Paper v-if="$auth.user" padded-2 class="world-list-paper" >
+        <Paper v-if="$auth.user" padded-2 class="world-list-paper">
             <h2>Your worlds</h2>
             <WorldList v-if="worlds.length" :worlds="worlds" />
-            <p v-else>Your worlds will appear here.</p>
+            <p v-else>
+                Your worlds will appear here.
+            </p>
         </Paper>
 
-        <Paper v-if="publicWorlds.length" padded-2 class="world-list-paper" >
+        <Paper v-if="publicWorlds.length" padded-2 class="world-list-paper">
             <h2>Publicly viewable worlds</h2>
             <WorldList :worlds="publicWorlds" />
         </Paper>
@@ -40,8 +44,8 @@
         try {
             response = await $axios.get('/worlds/', {
                 params: {
-                    user_id: $auth.user.id
-                }
+                    user_id: $auth.user.id,
+                },
             });
         } catch (e) { console.error('Error fetching user worlds', e); }
 
@@ -60,8 +64,13 @@
     }
 
     export default {
-        layout: 'default',
         components: { Input, Button, FormRow, Paper, WorldList },
+        layout: 'default',
+        async asyncData({ $axios, $auth }) {
+            const worlds = await fetchWorlds($axios, $auth);
+            const publicWorlds = await fetchPublicWorlds($axios);
+            return { worlds, publicWorlds };
+        },
         data() {
             return {
                 creating: false,
@@ -71,21 +80,15 @@
             };
         },
         computed: {},
-        async asyncData({ $axios, $auth }) {
-            const worlds = await fetchWorlds($axios, $auth);
-            const publicWorlds = await fetchPublicWorlds($axios);
-            return { worlds, publicWorlds };
-        },
         methods: {
             onWorldName(value) {
                 this.worldName = value;
             },
             async onSubmit() {
                 this.creating = true;
-                let response;
 
                 try {
-                    response = await this.$axios.post('/worlds/', {
+                    await this.$axios.post('/worlds/', {
                         name: this.worldName,
                         isPublic: false,
                     });
@@ -98,8 +101,8 @@
 
                 this.creating = false;
             },
-        }
-    }
+        },
+    };
 </script>
 <style lang="scss" scoped>
     .worlds {

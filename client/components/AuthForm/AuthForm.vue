@@ -1,13 +1,15 @@
 <template>
     <form @submit.prevent="$emit('submit', user)">
         <div>
-            <Input type="email" v-model="user.email" label="E-mail" />
+            <Input v-model="user.email" type="email" label="E-mail" />
         </div>
         <div>
-            <Input type="password" v-model="user.password" label="Password" />
+            <Input v-model="user.password" type="password" label="Password" />
         </div>
         <div>
-            <Button type="submit">{{ buttonLabel || 'Submit' }}</Button> 
+            <Button type="submit">
+                {{ buttonLabel || 'Submit' }}
+            </Button>
         </div>
     </form>
 </template>
@@ -23,7 +25,7 @@
             buttonLabel: {
                 type: String,
                 required: true,
-            }
+            },
         },
 
         data() {
@@ -31,8 +33,8 @@
                 user: {
                     email: '',
                     password: '',
-                }
-            }
-        }
-    }
+                },
+            };
+        },
+    };
 </script>

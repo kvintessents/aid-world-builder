@@ -2,15 +2,14 @@
     <nav class="header">
         <div class="logo-container">
             <nuxt-link to="/" class="logo-link">
-                <h1 v-if="isFrontpage" class="logo">AID WB</h1>
-                <div v-else class="logo">{{ isEditPage ? 'AID WB' : 'AID WB' }}</div>
+                <h1 v-if="isFrontpage" class="logo">
+                    AID WB
+                </h1>
+                <div v-else class="logo">
+                    {{ isEditPage ? 'AID WB' : 'AID WB' }}
+                </div>
             </nuxt-link>
-            <input v-if="isEditPage" class="logo world-input" :value="worldName" :size="worldName.length" @input="onWorldNameInput" />
-        </div>
-        
-
-        <div class="search">
-            <!-- <Input no-margin class="search-input" type="search" placeholder="Otsing" /> -->
+            <input v-if="isEditPage" class="logo world-input" :value="worldName" :size="worldName.length" @input="onWorldNameInput">
         </div>
 
         <div class="user-controls">
@@ -21,15 +20,14 @@
 
 <script>
     import UserControls from '~/components/NavBar/UserControls';
-    import Input from '~/components/core/atoms/Input';
 
     export default {
-        components: { UserControls, Input },
+        components: { UserControls },
         props: {
             isFrontpage: {
                 type: Boolean,
                 default: false,
-            }
+            },
         },
         computed: {
             worldName() {
@@ -37,14 +35,14 @@
             },
             isEditPage() {
                 return this.$route.name === 'world-id';
-            }
+            },
         },
         methods: {
             onWorldNameInput(event) {
                 this.$store.dispatch('world/nameChange', event.target.value);
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

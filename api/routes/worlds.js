@@ -1,25 +1,25 @@
+const { promisify } = require('util');
 const { Router } = require('express');
 const router = Router();
+const sql = require('sql-template-strings');
+const { celebrate, Joi } = require('celebrate');
+const { escape } = require('sqlstring');
 const db = require('../utils/database');
 const asyncRoute = require('../utils/asyncRoute');
-const sql = require('sql-template-strings');
-const { promisify } = require('util');
-const { celebrate, Joi } = require('celebrate');
 const userAuth = require('../middlewares/userAuth.middleware');
-const { escape } = require('sqlstring');
 
 const query = promisify(db.query).bind(db);
 
-async function saveWorld({ id, version, document, userId, isPublic, name }) {
+async function saveWorld({ id, document, userId, isPublic, name }) {
     let publicTerm = '';
     let nameTerm = '';
 
     if (typeof isPublic === 'boolean') {
-        publicTerm = `, is_public = ${isPublic ? 1 : 0}`
+        publicTerm = `, is_public = ${isPublic ? 1 : 0}`;
     }
 
     if (typeof name === 'string' && name.trim().length) {
-        nameTerm = `, name = ${escape(name)}`
+        nameTerm = `, name = ${escape(name)}`;
     }
 
     const command = `
@@ -49,7 +49,7 @@ async function createWorld({ name, isPublic, userId }) {
     `);
 }
 
-router.get('/worlds/', userAuth, asyncRoute(async function (req, res) {
+router.get('/worlds/', userAuth, asyncRoute(async function(req, res) {
     const userId = res.locals.user.id;
 
     const result = await query(sql`
@@ -63,7 +63,7 @@ router.get('/worlds/', userAuth, asyncRoute(async function (req, res) {
     res.json({ success: true, data: result });
 }));
 
-router.get('/public-worlds/', asyncRoute(async function (req, res) {
+router.get('/public-worlds/', asyncRoute(async function(req, res) {
     const result = await query(sql`
         SELECT
             id, name, is_public, user_id, version, created_at, LENGTH(document) as document_length
@@ -75,7 +75,7 @@ router.get('/public-worlds/', asyncRoute(async function (req, res) {
     res.json({ success: true, data: result });
 }));
 
-router.get('/worlds/:id', userAuth, asyncRoute(async function (req, res) {
+router.get('/worlds/:id', userAuth, asyncRoute(async function(req, res) {
     const userId = res.locals.user && res.locals.user.id ? parseInt(res.locals.user.id) : null;
     const isAdmin = Boolean(res.locals.user && res.locals.user.is_admin);
 
@@ -103,7 +103,7 @@ router.post('/worlds/', userAuth, celebrate({
         name: Joi.string().required().min(2),
         isPublic: Joi.boolean(),
     }),
-}), asyncRoute(async function (req, res) {
+}), asyncRoute(async function(req, res) {
     const result = await createWorld({
         name: req.body.name,
         userId: res.locals.user.id,
@@ -113,15 +113,15 @@ router.post('/worlds/', userAuth, celebrate({
     res.json({
         success: true,
         data: {
-            id: result.insertId
-        }
+            id: result.insertId,
+        },
     });
 }));
 
 // UPDATE WORLD
 router.post('/world/:id', userAuth, celebrate({
     params: {
-        id: Joi.number().required()
+        id: Joi.number().required(),
     },
     body: Joi.object().keys({
         document: Joi.string().required(),
@@ -129,9 +129,9 @@ router.post('/world/:id', userAuth, celebrate({
         version: Joi.number().required(),
         name: Joi.string().default(null),
     }),
-}), asyncRoute(async function (req, res) {
+}), asyncRoute(async function(req, res) {
     if (!res.locals.user || !res.locals.user.id) {
-        return res.status(403).json({ success: false })
+        return res.status(403).json({ success: false });
     }
 
     const { version, document, isPublic, name } = req.body;
@@ -142,7 +142,7 @@ router.post('/world/:id', userAuth, celebrate({
         version,
         isPublic,
         name,
-        document
+        document,
     });
 
     res.json({ success: true, data: result });

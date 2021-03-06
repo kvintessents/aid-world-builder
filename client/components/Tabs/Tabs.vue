@@ -8,20 +8,19 @@
             >
                 <button
                     class="tab"
-                    @click="tabHandler(index)"
                     :aria-selected="index === activeIndex ? 'true' : null"
                     :aria-controls="tab.data.attrs.id"
                     :class="{ active: index === activeIndex }"
+                    @click="tabHandler(index)"
                 >
                     {{ tab.componentOptions.propsData.name }}
                 </button>
             </li>
         </ul>
         <Paper padded-2>
-            <slot></slot>
+            <slot />
         </Paper>
     </div>
-    
 </template>
 <script>
     import Paper from '~/components/core/atoms/Paper';
@@ -37,7 +36,7 @@
         },
         created() {
             this.tabs = this.$slots.default.filter(
-                vnode => vnode.tag && vnode.componentOptions && vnode.componentOptions.propsData.name
+                vnode => vnode.tag && vnode.componentOptions && vnode.componentOptions.propsData.name,
             );
             this.updateActive();
         },
@@ -59,14 +58,13 @@
                         }
                     }
                 }
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>
     .list {
-        // margin: 0 0 0em 0.33em;
         margin: 0;
         margin-left: 1px;
         padding: 0;
@@ -86,7 +84,6 @@
         background: rgba(255, 255, 255, 0.5);
         border: 0;
         padding: 1em 2em;
-        // border-bottom: 2px solid transparent;
         outline: none;
         cursor: pointer;
     }
@@ -97,7 +94,6 @@
 
     .tab.active {
         background: #fff;
-        // border-bottom: 2px solid #00a7e5;
         color: #0096ce;
     }
 </style>

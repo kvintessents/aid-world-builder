@@ -1,34 +1,37 @@
 <template>
-    <component :is="tagType"
+    <component
+        :is="tagType"
         class="button"
         :class="{
             loading: loading
         }"
 
-        v-on="$listeners"
         v-bind="$attrs"
-    ><slot></slot></component>
+        v-on="$listeners"
+    >
+        <slot />
+    </component>
 </template>
 
 <script>
-export default {
-    props: {
-        loading: {
-            type: Boolean,
-            required: false,
+    export default {
+        inheritAttrs: false,
+        props: {
+            loading: {
+                type: Boolean,
+                required: false,
+            },
+            link: {
+                type: Boolean,
+                default: false,
+            },
         },
-        link: {
-            type: Boolean,
-            default: false,
-        }
-    },
-    computed: {
-        tagType() {
-            return this.link ? 'a' : 'button';
-        }
-    },
-    inheritAttrs: false,
-}
+        computed: {
+            tagType() {
+                return this.link ? 'a' : 'button';
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

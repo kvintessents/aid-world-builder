@@ -4,18 +4,20 @@
         :class="{
             disabled: disabled
         }"
-    ><slot></slot></select>
+    >
+        <slot />
+    </select>
 </template>
 
 <script>
-export default {
-    props: {
-        disabled: {
-            type: Boolean,
-            required: false,
-        }
-    }
-}
+    export default {
+        props: {
+            disabled: {
+                type: Boolean,
+                required: false,
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

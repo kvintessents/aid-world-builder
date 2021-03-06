@@ -1,10 +1,10 @@
+const { promisify } = require('util');
 const { Router } = require('express');
 const router = Router();
+const sql = require('sql-template-strings');
+const { celebrate, Joi } = require('celebrate');
 const db = require('../utils/database');
 const asyncRoute = require('../utils/asyncRoute');
-const sql = require('sql-template-strings');
-const { promisify } = require('util');
-const { celebrate, Joi } = require('celebrate');
 const userAuth = require('../middlewares/userAuth.middleware');
 
 const query = promisify(db.query).bind(db);
@@ -14,7 +14,7 @@ router.post('/feedback/', userAuth, celebrate({
         anonymous: Joi.boolean().default(false),
         feedback: Joi.string().min(1).required(),
     }),
-}), asyncRoute(async function (req, res) {
+}), asyncRoute(async function(req, res) {
     if (!res.locals.user) {
         return res.json(404);
     }
@@ -31,7 +31,7 @@ router.post('/feedback/', userAuth, celebrate({
     res.json({ success: true, data: response });
 }));
 
-router.get('/feedback', userAuth, asyncRoute(async function (req, res) {
+router.get('/feedback', userAuth, asyncRoute(async function(req, res) {
     if (!res.locals.user || res.locals.user.id !== 1) {
         return res.status(404);
     }
@@ -46,7 +46,7 @@ router.get('/feedback', userAuth, asyncRoute(async function (req, res) {
     res.json({ success: true, data: results });
 }));
 
-router.get('/recreate/feedback', asyncRoute(async function (req, res) {
+router.get('/recreate/feedback', asyncRoute(async function(req, res) {
     await query(sql`
         DROP TABLE IF EXISTS feedback
     `);

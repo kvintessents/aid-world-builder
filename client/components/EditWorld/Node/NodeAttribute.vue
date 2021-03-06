@@ -3,119 +3,124 @@
         <td class="column-key">
             <ValueTextarea
                 class="input key"
+                :value="attribute.key"
+                :size-cache-breaker="sizeCacheBreaker"
                 @input="handleKeyChange"
                 @keydown="onValueKeyDown"
-                :value="attribute.key"
-                :sizeCacheBreaker="sizeCacheBreaker" />
-            <button class="delete-button" @click="removeProperty">ⓧ</button>
+            />
+            <button class="delete-button" @click="removeProperty">
+                ⓧ
+            </button>
         </td>
         <td class="column-value">
             <ValueTextarea
                 class="input value"
+                :value="attribute.value"
+                :size-cache-breaker="sizeCacheBreaker"
                 @input="handleValueChange"
                 @keydown="onKeyKeyDown"
-                :value="attribute.value"
-                :sizeCacheBreaker="sizeCacheBreaker"
             />
-            <div class="reorder-handle" @mousedown="startReorder"><span class="reorder-handle-innard">↕</span></div>
+            <div class="reorder-handle" @mousedown="startReorder">
+                <span class="reorder-handle-innard">↕</span>
+            </div>
         </td>
     </tr>
 </template>
 
 <script>
-import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
-export default {
-    components: { ValueTextarea },
-    props: {
-        node: {
-            type: Object,
-            required: true,
+    import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
+    export default {
+        components: { ValueTextarea },
+        props: {
+            node: {
+                type: Object,
+                required: true,
+            },
+            attribute: {
+                type: Object,
+                required: true,
+            },
+            index: {
+                type: Number,
+                required: true,
+            },
+            sizeCacheBreaker: {
+                type: String,
+                default: '',
+            },
         },
-        attribute: {
-            type: Object,
-            required: true,
+        computed: {
+            isEmpty() {
+                const index = parseInt(this.index, 10);
+                return (
+                    this.node.properties[index].value.trim() === '' &&
+                    this.node.properties[index].key.trim() === ''
+                );
+            },
         },
-        index: {
-            type: Number,
-            required: true,
-        },
-        sizeCacheBreaker: {
-            type: String,
-            default: '',
-        }
-    },
-    computed: {
-        isEmpty() {
-            const index = parseInt(this.index, 10);
-            return (
-                this.node.properties[index].value.trim() === '' &&
-                this.node.properties[index].key.trim() === ''
-            )
-        },
-    },
-    methods: {
-        handleKeyChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: this.index,
-                key: event.target.value
-            });
-        },
-        handleValueChange(event) {
-            this.$store.dispatch('world/setProperty', {
-                node: this.node,
-                index: this.index,
-                value: event.target.value
-            });
-        },
-        onKeyKeyDown(event) {
-            if (event.key !== 'Tab') {
+        methods: {
+            handleKeyChange(event) {
+                this.$store.dispatch('world/setProperty', {
+                    node: this.node,
+                    index: this.index,
+                    key: event.target.value,
+                });
+            },
+            handleValueChange(event) {
+                this.$store.dispatch('world/setProperty', {
+                    node: this.node,
+                    index: this.index,
+                    value: event.target.value,
+                });
+            },
+            onKeyKeyDown(event) {
+                if (event.key !== 'Tab') {
+                    return true;
+                }
+
+                const index = parseInt(this.index, 10);
+                const lastIndex = this.node.properties.length - 1;
+
+                if (index === lastIndex) {
+                    this.$store.commit('world/appendNewProperty', { node: this.node });
+                }
+
                 return true;
-            }
+            },
+            onValueKeyDown(event) {
+                if (event.key !== 'Backspace') {
+                    return true;
+                }
 
-            const index = parseInt(this.index, 10);
-            const lastIndex = this.node.properties.length - 1;
+                if (this.isEmpty) {
+                    this.$store.dispatch('world/removeProperty', {
+                        node: this.node,
+                        propertyIndex: this.index,
+                    });
+                }
 
-            if (index === lastIndex) {
-                this.$store.commit('world/appendNewProperty', { node: this.node });
-            }
-
-            return true;
-        },
-        onValueKeyDown(event) {
-            if (event.key !== 'Backspace') {
                 return true;
-            }
+            },
+            startReorder(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.$emit('startReorder', { event, component: this });
+            },
+            removeProperty() {
+                if (!this.isEmpty) {
+                    const confirmed = window.confirm('Are you sure you want to delete this trait?');
+                    if (!confirmed) {
+                        return;
+                    }
+                }
 
-            if (this.isEmpty) {
                 this.$store.dispatch('world/removeProperty', {
                     node: this.node,
-                    propertyIndex: this.index
+                    propertyIndex: this.index,
                 });
-            }
-
-            return true;
+            },
         },
-        startReorder(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            this.$emit('startReorder', { event, component: this });
-        },
-        removeProperty(event) {
-            if (!this.isEmpty) {
-                const confirmed = window.confirm('Are you sure you want to delete this trait?');
-                if (!confirmed) {
-                    return;
-                }
-            }
-
-            this.$store.dispatch('world/removeProperty', {
-                node: this.node,
-                propertyIndex: this.index
-            });
-        }
-    }
-}
+    };
 </script>
 
 <style scoped lang="scss">

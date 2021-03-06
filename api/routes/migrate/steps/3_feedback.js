@@ -7,4 +7,4 @@ module.exports = async ({ sql, query }) => {
             created_at TIMESTAMP NOT NULL
         );
     `);
-}
+};

@@ -1,5 +1,7 @@
 <template>
-    <p class="paragraph"><slot></slot></p>
+    <p class="paragraph">
+        <slot />
+    </p>
 </template>
 
 <style lang="scss" scoped>

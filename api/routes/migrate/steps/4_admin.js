@@ -7,6 +7,4 @@ module.exports = async ({ sql, query }) => {
     await query(sql`
         UPDATE users SET is_admin = 1 WHERE id = 1;
     `);
-
-    return;
-}
+};
