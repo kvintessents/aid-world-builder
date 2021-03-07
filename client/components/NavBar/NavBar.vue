@@ -50,9 +50,8 @@
         background: #fff;
         padding: 1em;
         box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
-
         display: flex;
-        flex-wrap: nowrap;
+        justify-content: space-between;
     };
 
     .logo-link {
@@ -77,7 +76,8 @@
         margin-left: 1em;
     }
 
-    .search {
-        flex-grow: 1;
+    .user-controls {
+        position: relative;
+        top: 0.35em;
     }
 </style>

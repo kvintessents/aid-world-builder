@@ -15,6 +15,8 @@
 
                 <NodeAttributes v-if="node.properties.length" :node="node" />
 
+                <NodeLabels :hub="hub" :node="node" />
+
                 <div class="add-trait">
                     <Button tiny create @click="appendFirstProperty">
                         + Add trait
@@ -26,12 +28,14 @@
 </template>
 
 <script>
+    import Vue from 'vue';
     import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
     import Button from '~/components/core/atoms/Button';
     import NodeAttributes from '~/components/EditWorld/Node/NodeAttributes';
+    import NodeLabels from '~/components/EditWorld/Node/NodeLabels';
 
     export default {
-        components: { ValueTextarea, Button, NodeAttributes },
+        components: { ValueTextarea, Button, NodeAttributes, NodeLabels },
         props: {
             node: {
                 type: Object,
@@ -40,6 +44,10 @@
             previewing: {
                 type: Boolean,
                 default: false,
+            },
+            hub: {
+                type: Vue,
+                required: true,
             },
         },
         data() {
@@ -57,6 +65,9 @@
 
                 return `${this.node.minimized}.${width}`;
             },
+        },
+        created() {
+            this.hub.$on('menuAddLabel', this.addLabel.bind(this));
         },
         methods: {
             handleNameChange(event) {
@@ -79,6 +90,9 @@
                     node: this.node,
                     initValue: { key: 'trait', value: 'value' },
                 });
+            },
+            addLabel() {
+
             },
         },
     };

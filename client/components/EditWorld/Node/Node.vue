@@ -7,7 +7,7 @@
         @mousedown="onMouseDown"
     >
         <NodePreview v-if="previewing" :node="node" :type="previewType" />
-        <NodeContents v-else :node="node" />
+        <NodeContents v-else :node="node" :hub="hub" />
 
         <div class="hover-controls" @mousedown="stopPropagation" @click="stopPropagation">
             <div v-if="positioned" class="resize" @mousedown="resizeStart" />
@@ -16,37 +16,24 @@
             </div>
         </div>
 
-        <div class="menu" @mousedown="stopPropagation" @click="stopPropagation">
-            <div class="menu-button">
-                ☰
-            </div>
-            <ul class="menu-contents">
-                <li @click="togglePreviewZaltys">
-                    Preview (Zalty's)
-                </li>
-                <li @click="togglePreview">
-                    Preview (JSON)
-                </li>
-                <li @click="duplicateNode">
-                    Duplicate
-                </li>
-                <li @click="addLabel">
-                    Add label
-                </li>
-                <li @click="deleteNode">
-                    Delete
-                </li>
-            </ul>
-        </div>
+        <NodeMenu
+            :hub="hub"
+            :node="node"
+            :previewing="previewing"
+            :preview-type="previewType"
+            @togglePreview="togglePreview"
+        />
     </div>
 </template>
 
 <script>
+    import Vue from 'vue';
     import NodeContents from '~/components/EditWorld/Node/NodeContents';
     import NodePreview from '~/components/EditWorld/Node/NodePreview';
+    import NodeMenu from '~/components/EditWorld/Node/NodeMenu';
 
     export default {
-        components: { NodeContents, NodePreview },
+        components: { NodeContents, NodePreview, NodeMenu },
         props: {
             node: {
                 type: Object,
@@ -65,6 +52,7 @@
                 previewType: 'json',
                 previewing: false,
                 id: `node-${Math.floor(Math.random() * 1000000)}`,
+                hub: new Vue(),
             };
         },
         computed: {
@@ -189,13 +177,6 @@
             stopPropagation(event) {
                 event.stopPropagation();
             },
-            deleteNode(event) {
-                event.stopPropagation();
-
-                if (window.confirm('Are you sure you wish to delete the entry? This cannot be undone.')) {
-                    this.$store.dispatch('world/deleteNode', this.node);
-                }
-            },
             minimizeNode(event) {
                 event.stopPropagation();
                 this.$store.dispatch('world/minimizeNode', this.node);
@@ -206,16 +187,12 @@
                     }, 100);
                 }
             },
-            togglePreview() {
-                this.previewType = 'json';
-                this.previewing = !this.previewing;
-            },
-            togglePreviewZaltys() {
-                this.previewType = 'zaltys';
-                this.previewing = !this.previewing;
-            },
-            duplicateNode() {
-                this.$store.dispatch('world/duplicateNode', this.node);
+            togglePreview(type) {
+                if (!this.previewing || this.previewType === type) {
+                    this.previewing = !this.previewing;
+                }
+
+                this.previewType = type;
             },
         },
     };
@@ -304,24 +281,5 @@
         height: 16px;
         background: url('~assets/copy.png');
         background-size: 16px 16px;
-    }
-
-    .menu {
-        position: absolute;
-        right: 10px;
-        top: 8px;
-        cursor: pointer;
-    }
-
-    .menu-button {
-        padding: 4px 8px;
-        background: rgba(0, 0, 0, 0.1);
-    }
-
-    .menu-contents {
-        position: absolute;
-        right: 0;
-        top: 15px;
-        background: #fff;
     }
 </style>

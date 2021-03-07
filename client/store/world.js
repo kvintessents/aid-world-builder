@@ -272,6 +272,9 @@ export const mutations = {
     nameChange(state, name) {
         state.name = name;
     },
+    setLabels(state, { node, labels }) {
+        state.nodes[state.nodes.indexOf(node)].labels = labels;
+    },
 };
 
 export const actions = {
@@ -349,5 +352,8 @@ export const actions = {
         commit('nameChange', args);
         dispatch('sync');
     },
-}
-;
+    setLabels({ commit, dispatch }, args) {
+        commit('setLabels', args);
+        dispatch('sync');
+    },
+};
