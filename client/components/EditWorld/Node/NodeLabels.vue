@@ -9,7 +9,12 @@
             @blur="onBlur"
             @focus="onFocus"
             @change="onChange"
+            @keydown="onKeyDown"
         >
+        <p v-show="editing" class="label-description">
+            Labels are separated by comma. Color is automatic. <br>
+            These labels don't get exported and are only for organizing.
+        </p>
         <span v-show="!editing" @click="editLabels">
             <span
                 v-for="label in node.labels"
@@ -24,6 +29,7 @@
     import Vue from 'vue';
 
     /**
+     * https://gist.github.com/tommyettinger/46a874533244883189143505d203312c
      * @param {number} a
      * @return {function}
      */
@@ -88,6 +94,12 @@
             onFocus() {
                 this.editing = true;
             },
+            onKeyDown(event) {
+                if (event.key === 'Enter') {
+                    this.$refs.input.blur();
+                    this.editing = false;
+                }
+            },
             onChange() {
                 const labelValues = [...new Set(
                     this.editString
@@ -123,6 +135,7 @@
         margin-top: 1em;
         width: 100%;
     }
+
     .label  {
         background: rgba(0, 134, 229, 0.2);
         margin-right: 0.2em;
@@ -130,10 +143,21 @@
         border-radius: 0.5em;
         display: inline-block;
     }
+
     .label-input {
         padding: 0.2em 0.75em;
         display: block;
         width: 100%;
         box-sizing: border-box;
+        font-size: inherit;
+        font-family: inherit;
+        font-weight: inherit;
+    }
+
+    .label-description {
+        font-size: 0.9em;
+        line-height: 1.5em;
+        margin-top: 0.5em;
+        margin-bottom: 0;
     }
 </style>

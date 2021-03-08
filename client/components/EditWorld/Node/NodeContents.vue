@@ -1,11 +1,11 @@
 <template>
     <div class="node-contents">
         <header class="header" :class="{ selected: node.selected }">
-            <input class="input name" :value="node.name" @input="handleNameChange" @mousedown="stopPropagation">
+            <input class="input name" :value="node.name" @input="handleNameChange" @mousedown="onContentsMouseDown">
         </header>
 
         <section class="body" :class="{ minimized: node.minimized }">
-            <div class="contents" @mousedown="stopPropagation">
+            <div class="contents" @mousedown="onContentsMouseDown">
                 <ValueTextarea
                     class="input tags"
                     :value="node.tags"
@@ -66,9 +66,6 @@
                 return `${this.node.minimized}.${width}`;
             },
         },
-        created() {
-            this.hub.$on('menuAddLabel', this.addLabel.bind(this));
-        },
         methods: {
             handleNameChange(event) {
                 this.$store.dispatch('world/setAttributes', {
@@ -91,8 +88,9 @@
                     initValue: { key: 'trait', value: 'value' },
                 });
             },
-            addLabel() {
-
+            onContentsMouseDown(event) {
+                event.stopPropagation();
+                this.hub.$emit('NodeContents-mouseDown');
             },
         },
     };
@@ -127,7 +125,7 @@
     }
 
     .header {
-        padding: 1em 1.5em;
+        padding: 1em 3em;
         text-align: center;
         background: rgba(0, 0, 0, 0.05);
         border-radius: 0.4em 0.4em 0 0;

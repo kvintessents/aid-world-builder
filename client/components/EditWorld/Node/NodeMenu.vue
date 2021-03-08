@@ -1,6 +1,6 @@
 <template>
     <div class="menu" @mousedown="stopPropagation">
-        <div class="menu-button" :class="{ open }" @click="toggleMenu" @mousedown="stopPropagation">
+        <div class="menu-button" :class="{ open }" @click="toggleMenu">
             <span class="menu-icon">☰</span>
         </div>
         <ul v-if="open" class="menu-list" @click="toggleMenu">
@@ -61,13 +61,18 @@
                 this.open = !this.open;
 
                 if (this.open) {
-                    window.addEventListener('mousedown', () => {
-                        this.open = false;
-                    });
+                    window.addEventListener('mousedown', this.closeMenu);
+                    this.hub.$on('NodeContents-mouseDown', this.closeMenu);
+                } else {
+                    window.removeEventListener('mousedown', this.closeMenu);
+                    this.hub.$off('NodeContents-mouseDown', this.closeMenu);
                 }
             },
             stopPropagation(e) {
                 e.stopPropagation();
+            },
+            closeMenu() {
+                this.open = false;
             },
             deleteNode(event) {
                 event.stopPropagation();
