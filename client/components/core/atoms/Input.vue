@@ -3,10 +3,10 @@
         <div v-if="label" class="label">
             {{ label ? label : '' }}
         </div>
-    
+
         <input
-            class="input"
             v-model="localValue"
+            class="input"
             :value="value"
 
             :type="type"
@@ -15,30 +15,30 @@
                 loading: loading
             }"
             :placeholder="label"
-        />
+        >
     </label>
 </template>
 
 <script>
-export default {
-    props: {
-        disabled: { type: Boolean, required: false },
-        loading: { type: Boolean, default: false },
-        type: { type: String, default: 'text' },
-        label: { type: String, default: null },
-        value: { type: String, default: null },
-    },
-    computed: {
-        localValue: {
-            get() {
-                return this.value;
+    export default {
+        props: {
+            disabled: { type: Boolean, required: false },
+            loading: { type: Boolean, default: false },
+            type: { type: String, default: 'text' },
+            label: { type: String, default: null },
+            value: { type: String, default: null },
+        },
+        computed: {
+            localValue: {
+                get() {
+                    return this.value;
+                },
+                set(value) {
+                    this.$emit('input', value);
+                },
             },
-            set(value) {
-                this.$emit('input', value);
-            }
-        }
-    }
-}
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

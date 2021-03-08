@@ -1,9 +1,9 @@
 const { Router } = require('express');
+const sql = require('sql-template-strings');
 const asyncRoute = require('../../utils/asyncRoute');
+const query = require('../../utils/query');
 const migrationModel = require('./migrationModel');
 const getMigrationSteps = require('./migrationSteps');
-const sql = require('sql-template-strings');
-const query = require('../../utils/query');
 const router = Router();
 
 async function doStep(step) {
@@ -13,7 +13,7 @@ async function doStep(step) {
         return {
             success: false,
             message: 'Error when doing migration step.',
-            error
+            error,
         };
     }
 
@@ -23,14 +23,14 @@ async function doStep(step) {
         return {
             success: false,
             message: 'Error when marking migration step as done.',
-            error
+            error,
         };
     }
 
     return { success: true };
 }
 
-router.get('/migrate/all', asyncRoute(async function (req, res) {
+router.get('/migrate/all', asyncRoute(async function(req, res) {
     if (req.query.passwd !== process.env.DB_MIGRATION_PASSWORD) {
         return res.status(404).json({ success: false, error: 'Not found.' });
     }
@@ -40,7 +40,7 @@ router.get('/migrate/all', asyncRoute(async function (req, res) {
     } catch (e) {
         console.error(e);
         res.json({ success: false, error: e });
-        return ;
+        return;
     }
 
     const migrationSteps = await getMigrationSteps();
@@ -54,7 +54,7 @@ router.get('/migrate/all', asyncRoute(async function (req, res) {
         const result = await doStep(step);
 
         if (!result.success) {
-            res.status(500).json(Object.assign({ step }, result))
+            res.status(500).json(Object.assign({ step }, result));
             return;
         }
 

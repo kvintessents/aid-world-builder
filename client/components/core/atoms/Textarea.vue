@@ -4,43 +4,46 @@
             {{ label ? label : '' }}
         </div>
         <textarea
+            v-bind="$attrs"
+            ref="textarea"
             class="textarea"
             @input="input"
             v-on="listeners"
-            v-bind="$attrs"
-            ref="textarea"
-        ></textarea>
+        />
     </label>
 </template>
 
 <script>
-export default {
-    props: {
-        loading: { type: Boolean, default: false },
-        type: { type: String, default: 'text' },
-        label: { type: String, default: null },
-        value: { type: String, default: '' },
-        textareaClass: { type: String, default: '' },
-        autofocus: { type: Boolean, default: false }
-    },
-    inheritAttrs: false,
-    computed: {
-        listeners() {
-            const { input, ...listeners } = this.$listeners;
-            return listeners;
+    export default {
+        inheritAttrs: false,
+        props: {
+            loading: { type: Boolean, default: false },
+            type: { type: String, default: 'text' },
+            label: { type: String, default: null },
+            value: { type: String, default: '' },
+            textareaClass: { type: String, default: '' },
+            autofocus: { type: Boolean, default: false },
         },
-    },
-    methods: {
-        input(event) {
-            this.$emit('input', event.target.value);
+        computed: {
+            listeners() {
+                const listeners = {
+                    ...this.$listeners,
+                };
+                delete listeners.input;
+                return listeners;
+            },
         },
-    },
-    mounted() {
-        if (this.autofocus) {
-            setTimeout(() => this.$refs.textarea.focus(), 0);
-        }
-    }
-}
+        mounted() {
+            if (this.autofocus) {
+                setTimeout(() => this.$refs.textarea.focus(), 0);
+            }
+        },
+        methods: {
+            input(event) {
+                this.$emit('input', event.target.value);
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

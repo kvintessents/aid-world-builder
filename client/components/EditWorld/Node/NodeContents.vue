@@ -1,90 +1,99 @@
 <template>
     <div class="node-contents">
         <header class="header" :class="{ selected: node.selected }">
-            <input class="input name" @input="handleNameChange" :value="node.name" @mousedown="stopPropagation" />
+            <input class="input name" :value="node.name" @input="handleNameChange" @mousedown="onContentsMouseDown">
         </header>
 
         <section class="body" :class="{ minimized: node.minimized }">
-            <div class="contents" @mousedown="stopPropagation">
+            <div class="contents" @mousedown="onContentsMouseDown">
                 <ValueTextarea
                     class="input tags"
-                    @input="handleTagsChange"
                     :value="node.tags"
-                    :sizeCacheBreaker="sizeCacheBreaker"
+                    :size-cache-breaker="sizeCacheBreaker"
+                    @input="handleTagsChange"
                 />
 
                 <NodeAttributes v-if="node.properties.length" :node="node" />
 
+                <NodeLabels :hub="hub" :node="node" />
+
                 <div class="add-trait">
-                    <Button tiny create @click="appendFirstProperty">+ Add trait</Button>
+                    <Button tiny create @click="appendFirstProperty">
+                        + Add trait
+                    </Button>
                 </div>
             </div>
         </section>
-
-        <!-- <footer class="footer">
-            <NodeLabelControl :node="node" />
-        </footer> -->
     </div>
 </template>
 
 <script>
-import NodeLabelControl from '~/components/EditWorld/Node/NodeLabelControl';
-import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
-import Button from '~/components/core/atoms/Button';
-import NodeAttributes from '~/components/EditWorld/Node/NodeAttributes';
+    import Vue from 'vue';
+    import ValueTextarea from '~/components/EditWorld/Node/ValueTextarea';
+    import Button from '~/components/core/atoms/Button';
+    import NodeAttributes from '~/components/EditWorld/Node/NodeAttributes';
+    import NodeLabels from '~/components/EditWorld/Node/NodeLabels';
 
-export default {
-    components: { NodeLabelControl, ValueTextarea, Button, NodeAttributes },
-    props: {
-        node: {
-            type: Object,
-            required: true,
+    export default {
+        components: { ValueTextarea, Button, NodeAttributes, NodeLabels },
+        props: {
+            node: {
+                type: Object,
+                required: true,
+            },
+            previewing: {
+                type: Boolean,
+                default: false,
+            },
+            hub: {
+                type: Vue,
+                required: true,
+            },
         },
-        previewing: {
-            type: Boolean,
-            default: false,
+        data() {
+            return {
+                dragging: false,
+            };
         },
-    },
-    data() {
-        return {
-            dragging: false
-        }
-    },
-    computed: {
-        sizeCacheBreaker() {
-            let width = ''; 
+        computed: {
+            sizeCacheBreaker() {
+                let width = '';
 
-            if (this.node.size) {
-                width = this.node.size.width;
-            }
+                if (this.node.size) {
+                    width = this.node.size.width;
+                }
 
-            return `${this.node.minimized}.${width}`;
-        }
-    },
-    methods: {
-        handleNameChange(event) {
-            this.$store.dispatch('world/setAttributes', {
-                node: this.node,
-                attributes: { name: event.target.value }
-            });
+                return `${this.node.minimized}.${width}`;
+            },
         },
-        handleTagsChange(event) {
-            this.$store.dispatch('world/setAttributes', {
-                node: this.node,
-                attributes: { tags: event.target.value }
-            });
+        methods: {
+            handleNameChange(event) {
+                this.$store.dispatch('world/setAttributes', {
+                    node: this.node,
+                    attributes: { name: event.target.value },
+                });
+            },
+            handleTagsChange(event) {
+                this.$store.dispatch('world/setAttributes', {
+                    node: this.node,
+                    attributes: { tags: event.target.value },
+                });
+            },
+            stopPropagation(event) {
+                event.stopPropagation();
+            },
+            appendFirstProperty() {
+                this.$store.commit('world/appendNewProperty', {
+                    node: this.node,
+                    initValue: { key: 'trait', value: 'value' },
+                });
+            },
+            onContentsMouseDown(event) {
+                event.stopPropagation();
+                this.hub.$emit('NodeContents-mouseDown');
+            },
         },
-        stopPropagation(event) {
-            event.stopPropagation();
-        },
-        appendFirstProperty() {
-            this.$store.commit('world/appendNewProperty', {
-                node: this.node,
-                initValue: { key: 'trait', value: 'value' }
-            });
-        }
-    },
-}
+    };
 </script>
 <style lang="scss" scoped>
     $radius: 5px;
@@ -116,7 +125,7 @@ export default {
     }
 
     .header {
-        padding: 1em 1.5em;
+        padding: 1em 3em;
         text-align: center;
         background: rgba(0, 0, 0, 0.05);
         border-radius: 0.4em 0.4em 0 0;

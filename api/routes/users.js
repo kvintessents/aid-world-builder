@@ -1,17 +1,17 @@
 const { Router } = require('express');
+const sql = require('sql-template-strings');
 const db = require('../utils/database');
 const userAuthMiddleware = require('../middlewares/userAuth.middleware');
-const sql = require('sql-template-strings');
 
 const router = Router();
 
 /* GET user by ID. */
-router.get('/users/:id', function (req, res) {
+router.get('/users/:id', function(req, res) {
     res.json({});
 });
 
 // List all users
-router.get('/users', userAuthMiddleware, function (req, res) {
+router.get('/users', userAuthMiddleware, function(req, res) {
     db.query(
         sql`
             SELECT
@@ -28,7 +28,7 @@ router.get('/users', userAuthMiddleware, function (req, res) {
 });
 
 // Modify user
-router.put('/users/:id', userAuthMiddleware, function (req, res) {
+router.put('/users/:id', userAuthMiddleware, function(req, res) {
     const displayName = req.body.display_name;
     const id = res.locals.user.id;
     if (
@@ -61,7 +61,7 @@ router.put('/users/:id', userAuthMiddleware, function (req, res) {
 });
 
 /* GET users listing. */
-router.get('/users', function (req, res) {
+router.get('/users', function(req, res) {
     res.json({});
 });
 

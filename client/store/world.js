@@ -11,7 +11,7 @@ async function syncronizeState($axios, state) {
         document: JSON.stringify(document),
         version: Date.now(),
         isPublic: document.isPublic,
-        name: document.name
+        name: document.name,
     };
 
     return await $axios.post(`/world/${state.id}`, body);
@@ -22,10 +22,10 @@ function debounceFunction(fn, ms) {
     let toResolve = [];
     let toReject = [];
 
-    return async function(...args) {
+    return function(...args) {
         clearTimeout(timeout);
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             toResolve.push(resolve);
             toReject.push(reject);
 
@@ -40,8 +40,8 @@ function debounceFunction(fn, ms) {
                     toReject = [];
                 }
             }, ms);
-        })
-    }
+        });
+    };
 }
 
 const synchronize = debounceFunction(syncronizeState, 2000);
@@ -70,7 +70,7 @@ export const mutations = {
                 selected: false,
                 order: index++,
                 ...node,
-            }
+            };
         });
         Object.assign(state, document);
         state.id = world.id;
@@ -98,18 +98,18 @@ export const mutations = {
             minimized: false,
             selected: false,
             properties: [
-                { key: "gender", value: "female" },
-                { key: "hair color", value: "auburn" },
-                { key: "hair length", value: "long" },
-            ]
+                { key: 'gender', value: 'female' },
+                { key: 'hair color', value: 'auburn' },
+                { key: 'hair length', value: 'long' },
+            ],
         }));
     },
     deleteNode(state, nodeToDelete) {
         state.nodes = state.nodes.filter(node => {
-            return node !== nodeToDelete
+            return node !== nodeToDelete;
         });
     },
-    moveNodeBy(state, {node, position}) {
+    moveNodeBy(state, { node, position }) {
         const index = state.nodes.indexOf(node);
         state.nodes[index].position.x += position.x;
         state.nodes[index].position.y += position.y;
@@ -125,7 +125,7 @@ export const mutations = {
         const index = state.nodes.indexOf(node);
         state.nodes[index].size = Vue.observable({
             width: Math.max(size.width, 200),
-            height: size.height
+            height: size.height,
         });
     },
     setAttributes(state, { node, attributes }) {
@@ -171,7 +171,7 @@ export const mutations = {
     appendNewProperty(state, { node, initValue }) {
         const index = state.nodes.indexOf(node);
 
-        state.nodes[index].properties.push(initValue ? initValue : Vue.observable({key: '', value: ''}))
+        state.nodes[index].properties.push(initValue || Vue.observable({ key: '', value: '' }));
     },
     removeProperty(state, { node, propertyIndex }) {
         if (propertyIndex === undefined) {
@@ -179,7 +179,7 @@ export const mutations = {
             return;
         }
 
-        const index = state.nodes.indexOf(node)
+        const index = state.nodes.indexOf(node);
         state.nodes[index].properties.splice(propertyIndex, 1);
     },
     sendToTop(state, node) {
@@ -227,7 +227,7 @@ export const mutations = {
         state.nodes = Vue.observable([
             ...state.nodes.slice(0, i + 1),
             Vue.observable(copy),
-            ...state.nodes.slice(i + 1)
+            ...state.nodes.slice(i + 1),
         ]);
     },
     reorderNode(state, { node, targetIndex }) {
@@ -241,14 +241,16 @@ export const mutations = {
             state.nodes = state.nodes.filter(n => n !== node);
             state.nodes.push(node);
         } else {
-            let left = state.nodes.slice(0, targetIndex).filter(n => n !== node);
-            let right = state.nodes.slice(targetIndex).filter(n => n !== node);
+            const left = state.nodes.slice(0, targetIndex).filter(n => n !== node);
+            const right = state.nodes.slice(targetIndex).filter(n => n !== node);
 
-            state.nodes = Vue.observable([ ...left, node, ...right ]);
+            state.nodes = Vue.observable([...left, node, ...right]);
         }
 
         // Updates order values
-        state.nodes.forEach((n, i) => n.order = parseInt(i, 10));
+        state.nodes.forEach((n, i) => {
+            n.order = parseInt(i, 10);
+        });
     },
     reorderNodeAttribute(state, { node, currentIndex, targetIndex }) {
         const currentAttribute = node.properties[currentIndex];
@@ -261,27 +263,30 @@ export const mutations = {
             node.properties = node.properties.filter(x => x !== currentAttribute);
             node.properties.push(currentAttribute);
         } else {
-            let left = node.properties.slice(0, targetIndex).filter(x => x !== currentAttribute);
-            let right = node.properties.slice(targetIndex).filter(x => x !== currentAttribute);
+            const left = node.properties.slice(0, targetIndex).filter(x => x !== currentAttribute);
+            const right = node.properties.slice(targetIndex).filter(x => x !== currentAttribute);
 
-            node.properties = Vue.observable([ ...left, currentAttribute, ...right ]);
+            node.properties = Vue.observable([...left, currentAttribute, ...right]);
         }
     },
     nameChange(state, name) {
         state.name = name;
-    }
+    },
+    setLabels(state, { node, labels }) {
+        state.nodes[state.nodes.indexOf(node)].labels = labels;
+    },
 };
 
 export const actions = {
-    async addNode({ commit, dispatch }, position) {
+    addNode({ commit, dispatch }, position) {
         commit('addNode', position);
         dispatch('sync');
     },
-    async deleteNode({ commit, dispatch }, arg) {
+    deleteNode({ commit, dispatch }, arg) {
         commit('deleteNode', arg);
         dispatch('sync');
     },
-    async setAttributes({ dispatch, commit }, { node, attributes }) {
+    setAttributes({ dispatch, commit }, { node, attributes }) {
         commit('setAttributes', { node, attributes });
         dispatch('sync');
     },
@@ -294,57 +299,61 @@ export const actions = {
         await synchronize(this.$axios, state);
         commit('stopSync');
     },
-    async fetchWorld({ commit, state, auth, $auth }, id) {
+    async fetchWorld({ commit }, id) {
         const result = await this.$axios.get(`worlds/${id}`);
         const world = result.data.data;
         commit('setWorld', world);
     },
-    async moveNodeBy({ commit, dispatch }, args) {
+    moveNodeBy({ commit, dispatch }, args) {
         commit('moveNodeBy', args);
         dispatch('sync');
     },
-    async setNodeSize({ commit, dispatch }, args) {
+    setNodeSize({ commit, dispatch }, args) {
         commit('setNodeSize', args);
         dispatch('sync');
     },
-    async setProperty({ commit, dispatch }, args) {
+    setProperty({ commit, dispatch }, args) {
         commit('setProperty', args);
         dispatch('sync');
     },
-    async sendToTop({ commit, dispatch }, args) {
+    sendToTop({ commit, dispatch }, args) {
         commit('sendToTop', args);
         dispatch('sync');
     },
-    async removeProperty({ commit, dispatch }, args) {
+    removeProperty({ commit, dispatch }, args) {
         commit('removeProperty', args);
         dispatch('sync');
     },
-    async minimizeNode({ commit, dispatch }, args) {
+    minimizeNode({ commit, dispatch }, args) {
         commit('minimizeNode', args);
         dispatch('sync');
     },
-    async setNodeView({ commit, dispatch }, args) {
+    setNodeView({ commit, dispatch }, args) {
         commit('setNodeView', args);
         dispatch('sync');
     },
-    async setPublic({ commit, dispatch }, args) {
+    setPublic({ commit, dispatch }, args) {
         commit('setPublic', args);
         dispatch('sync');
     },
-    async duplicateNode({ commit, dispatch }, args) {
+    duplicateNode({ commit, dispatch }, args) {
         commit('duplicateNode', args);
         dispatch('sync');
     },
-    async reorderNode({ commit, dispatch }, args) {
+    reorderNode({ commit, dispatch }, args) {
         commit('reorderNode', args);
         dispatch('sync');
     },
-    async reorderNodeAttribute({ commit, dispatch }, args) {
+    reorderNodeAttribute({ commit, dispatch }, args) {
         commit('reorderNodeAttribute', args);
         dispatch('sync');
     },
-    async nameChange({ commit, dispatch }, args) {
+    nameChange({ commit, dispatch }, args) {
         commit('nameChange', args);
         dispatch('sync');
     },
-}
+    setLabels({ commit, dispatch }, args) {
+        commit('setLabels', args);
+        dispatch('sync');
+    },
+};

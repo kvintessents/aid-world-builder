@@ -2,7 +2,7 @@
   "name": "aid-world-builder",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "api/index.js",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -10,7 +10,8 @@
     "deploy": "nuxt build && gcloud app deploy app.yaml --project aid-world-builder --quiet",
     "db": "docker run -p 127.0.0.1:3306:3306 --name aid-world-builder-mysql -e MYSQL_ROOT_PASSWORD=password -d mysql:8",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "jsfix": "eslint --fix ./api"
+    "jsfix": "eslint --fix ./api",
+    "lint": "eslint --ext .ts,.js,.vue ."
   },
   "engines": {
     "node": ">=12.0.0"
@@ -46,5 +47,9 @@
     "slugify": "^1.4.5",
     "sql-template-strings": "^2.2.2",
     "sqlstring": "^2.3.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "^5.0.0",
+    "typescript": "^4.2.3"
   }
 }

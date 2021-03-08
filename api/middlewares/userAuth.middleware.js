@@ -1,7 +1,7 @@
+const { promisify } = require('util');
 const db = require('../utils/database');
 const jwt = require('../utils/jwt');
 const asyncMiddleware = require('../utils/asyncMiddleware');
-const { promisify } = require('util');
 
 const query = promisify(db.query).bind(db);
 

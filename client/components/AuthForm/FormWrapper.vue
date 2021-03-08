@@ -1,25 +1,27 @@
 <template>
     <Paper class="container">
-        <h1 class="title" v-if="title">{{ title }}</h1>
+        <h1 v-if="title" class="title">
+            {{ title }}
+        </h1>
 
         <div class="form-wrapper">
-            <slot></slot>
+            <slot />
         </div>
     </Paper>
 </template>
 
 <script>
-import Paper from '~/components/core/atoms/Paper';
+    import Paper from '~/components/core/atoms/Paper';
 
-export default {
-    components: { Paper },
-    props: {
-        title: {
-            type: String,
-            default: null,
-        }
-    }
-}
+    export default {
+        components: { Paper },
+        props: {
+            title: {
+                type: String,
+                default: null,
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -4,36 +4,39 @@
     </div>
 </template>
 <script>
-import jsonFormatter from '~/utils/formatters/jsonFormatter';
-import ZaltysFormatter from '~/utils/formatters/ZaltysFormatter';
+    import jsonFormatter from '~/utils/formatters/jsonFormatter';
+    import ZaltysFormatter from '~/utils/formatters/ZaltysFormatter';
 
-export default {
-    props: {
-        node: {
-            type: Object,
+    export default {
+        props: {
+            node: {
+                type: Object,
+                required: true,
+            },
+            type: {
+                type: String,
+                default: 'json',
+            },
         },
-        type: {
-            type: String,
-            default: 'json',
-        }
-    },
-    computed: {
-        output() {
-            if (this.type === 'json') {
-                return jsonFormatter(this.node, { isPreview: true }).entry;
-            }
+        computed: {
+            output() {
+                if (this.type === 'json') {
+                    return jsonFormatter(this.node, { isPreview: true }).entry;
+                }
 
-            if (this.type === 'zaltys') {
-                return ZaltysFormatter(this.node, { isPreview: true }).entry;
-            }
-        }
-    },
-    methods: {
-        stopPropagation(event) {
-            event.stopPropagation();
-        }
-    }
-}
+                if (this.type === 'zaltys') {
+                    return ZaltysFormatter(this.node, { isPreview: true }).entry;
+                }
+
+                return '';
+            },
+        },
+        methods: {
+            stopPropagation(event) {
+                event.stopPropagation();
+            },
+        },
+    };
 </script>
 <style lang="scss" scoped>
     .previewContents {

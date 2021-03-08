@@ -1,17 +1,16 @@
 <template>
     <FormWrapper title="Register a new account">
-        <AuthForm @submit="registerUserHandler" buttonLabel="Register a new account" />
+        <AuthForm button-label="Register a new account" @submit="registerUserHandler" />
     </FormWrapper>
 </template>
 
 <script>
     import FormWrapper from '~/components/AuthForm/FormWrapper.vue';
     import AuthForm from '~/components/AuthForm/AuthForm.vue';
-    import Paper from '~/components/core/atoms/Paper.vue';
 
     export default {
+        components: { FormWrapper, AuthForm },
         layout: 'default',
-        components: { FormWrapper, AuthForm, Paper },
         methods: {
             async registerUserHandler(user) {
                 let response = null;
@@ -21,17 +20,11 @@
                 } catch (e) {
                     if (e.response.data && e.response.data.validation) {
                         alert(e.response.data.validation.body.message);
-                    }
-                    
-                    else if (e.response.data.message) {
+                    } else if (e.response.data.message) {
                         alert(e.response.data.message);
-                    }
-
-                    else if (typeof e.response.data.error === 'string') {
+                    } else if (typeof e.response.data.error === 'string') {
                         alert(e.response.data.error);
-                    }
-
-                    else {
+                    } else {
                         alert(e.response.data);
                     }
 
@@ -41,7 +34,7 @@
                 if (response.data.success) {
                     this.$auth.setUserToken(response.data.data.token);
                 }
-            }
-        }
-    }
+            },
+        },
+    };
 </script>

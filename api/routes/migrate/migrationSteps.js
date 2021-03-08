@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
 
@@ -14,4 +14,4 @@ module.exports = async function migrationSteps() {
         fileName: fileName,
         action: require(path.join(dir, fileName)),
     }));
-}
+};

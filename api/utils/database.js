@@ -4,7 +4,7 @@ let connection = null;
 
 // Database Connection for Production
 if (global.process.env.NODE_ENV === 'production') {
-    let config = {
+    const config = {
         user: process.env.GCLOUD_SQL_USER,
         database: process.env.GCLOUD_SQL_DATABASE,
         password: process.env.GCLOUD_SQL_PASSWORD,
@@ -18,7 +18,7 @@ if (global.process.env.NODE_ENV === 'production') {
 
     connection = mysql.createConnection(config);
 
-    connection.connect(function (err) {
+    connection.connect(function(err) {
         if (err) {
             console.error('Error connecting: ' + err.stack);
             return;
@@ -40,7 +40,7 @@ if (global.process.env.NODE_ENV === 'production') {
         password: global.process.env.DB_PASS,
     });
 
-    connection.connect(function (err) {
+    connection.connect(function(err) {
         if (err) {
             console.error('Error connecting: ' + err.stack);
             return;

@@ -1,6 +1,6 @@
 <template>
     <div class="paper">
-        <slot></slot>
+        <slot />
     </div>
 </template>
 <style lang="scss" scoped>

@@ -1,15 +1,11 @@
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 
 function getForwardedClientIp(xForwaredFor) {
-    if (typeof xForwaredFor !== 'string') {
-        return null;
-    }
+    if (typeof xForwaredFor !== 'string') { return null; }
 
     const clientIp = xForwaredFor.split(',')[0].trim();
 
-    if (!clientIp) {
-        return null;
-    }
+    if (!clientIp) { return null; }
 
     return clientIp;
 }
@@ -31,12 +27,11 @@ module.exports = function rateLimiter(options = {}) {
                 .then(() => {
                     next();
                 })
-                .catch((rateLimiterRes) => {
+                .catch(rateLimiterRes => {
                     next({ error: 'rate-limiter', details: rateLimiterRes });
                 });
         } else {
             next();
         }
-
     };
 };

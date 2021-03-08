@@ -10,21 +10,21 @@
 </template>
 
 <script>
-import GraphControls from '~/components/EditWorld/GraphControls';
-import StatusBar from '~/components/EditWorld/StatusBar';
-import Graph from '~/components/EditWorld/Graph';
-import List from '~/components/EditWorld/List';
+    import GraphControls from '~/components/EditWorld/GraphControls';
+    import StatusBar from '~/components/EditWorld/StatusBar';
+    import Graph from '~/components/EditWorld/Graph';
+    import List from '~/components/EditWorld/List';
 
-export default {
-    components: { GraphControls, Graph, StatusBar, List },
-    computed: {
-        nodeView() {
-            return this.$store.state.world.isNodeView;
-        }
-    },
-    methods: {
-    }
-}
+    export default {
+        components: { GraphControls, Graph, StatusBar, List },
+        computed: {
+            nodeView() {
+                return this.$store.state.world.isNodeView;
+            },
+        },
+        methods: {
+        },
+    };
 </script>
 <style scoped lang="scss">
     .container {

@@ -9,12 +9,18 @@
         </thead>
         <tbody>
             <tr v-for="world in worlds" :key="world.id">
-                <td><nuxt-link :to="`world/${world.id}`" class="link">{{ world.name }}</nuxt-link></td>
                 <td>
-                    <span v-for="n in getLength(world)" :key="n" class="length-filled"></span>
-                    <span v-if="getLength(world) === maxLength" class="length-more"></span>
+                    <nuxt-link :to="`world/${world.id}`" class="link">
+                        {{ world.name }}
+                    </nuxt-link>
                 </td>
-                <td class="time">{{ getReadableCreatedAt(world) }}</td>
+                <td>
+                    <span v-for="n in getLength(world)" :key="n" class="length-filled" />
+                    <span v-if="getLength(world) === maxLength" class="length-more" />
+                </td>
+                <td class="time">
+                    {{ getReadableCreatedAt(world) }}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -33,7 +39,7 @@
         data() {
             return {
                 maxLength: 10,
-            }
+            };
         },
         methods: {
             getReadableCreatedAt(world) {
@@ -42,8 +48,8 @@
             getLength(world) {
                 return Math.floor(Math.min(parseInt(world.document_length, 10) / 300, this.maxLength));
             },
-        }
-    }
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

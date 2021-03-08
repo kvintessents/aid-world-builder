@@ -8,7 +8,6 @@ module.exports = (err, req, res, next) => {
         res.json({ success: false, payload: err.details, error: 'API Rate limiting exceeded.' });
     } else {
         res.status(500);
-        console.error(err);
         res.json({ success: false, payload: null, error: err.message });
     }
 };

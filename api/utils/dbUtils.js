@@ -18,7 +18,7 @@ function hierarchicalRow(flatRow) {
     }, {});
 }
 
-module.exports.getHierarchical = (rows) => {
+module.exports.getHierarchical = rows => {
     if (Array.isArray(rows)) {
         return rows.map(hierarchicalRow);
     }

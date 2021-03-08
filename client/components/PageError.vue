@@ -5,10 +5,10 @@
 </template>
 
 <script>
-export default {
-    props: ['pageError'],
-    created() {
+    export default {
+        props: ['pageError'],
+        created() {
 
-    }
-}
+        },
+    };
 </script>

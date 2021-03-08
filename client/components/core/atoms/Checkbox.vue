@@ -4,27 +4,27 @@
             type="checkbox"
             class="checkbox"
 
-            v-on="$listeners"
             v-bind="$attrs"
-        />
+            v-on="$listeners"
+        >
         <span class="label">{{ label }}</span>
     </label>
 </template>
 
 <script>
-export default {
-    props: {
-        label: {
-            type: String,
-            required: true,
+    export default {
+        inheritAttrs: false,
+        props: {
+            label: {
+                type: String,
+                required: true,
+            },
+            title: {
+                type: String,
+                default: null,
+            },
         },
-        title: {
-            type: String,
-            default: null,
-        }
-    },
-    inheritAttrs: false,
-}
+    };
 </script>
 
 <style lang="scss" scoped>

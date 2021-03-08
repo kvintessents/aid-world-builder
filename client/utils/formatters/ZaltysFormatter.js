@@ -12,12 +12,12 @@ function getEntry(node) {
         return `${key}<${node.name}>:${values}`;
     }).join(';');
 
-    return `${node.name}:[${traits}.]`
+    return `${node.name}:[${traits}.]`;
 }
 
-export default (node, { isPreview }) => ({
+export default node => ({
     id: node.randomId,
     keys: node.tags,
     entry: getEntry(traitSplitter(node)),
-    isNotHidden: true
-})
+    isNotHidden: true,
+});
